@@ -1,0 +1,18 @@
+ Concept de base (tes notes)
+
+Jeu d'avion 2D style Google Dino
+Éviter des oiseaux
+Après 5 min → météo orageuse → éviter des éclairs
+Boucle infinie + compteur de score
+Multijoueur local avec noms de pilotes + classement
+Jouable hors ligne (fichiers locaux, pas de serveur)
+Principalement iOS + Android
+Écran de chargement : "Idée par Samuel Alonso, codé par Karlito"
+Sons gratuits depuis d'autres sites
+
+Fonctionnalités que je te propose d'ajouter Gameplay 🌤️ Transitions météo progressives (soleil → nuages ​​​​→ orage → tempête de nuit) ⚡ Éclairs qui tombent en diagonale, pas seulement verticaux 🐦 Types d'oiseaux différents (rapide, en formation, imprévisible) double score Multijoueur local Tour par tour sur le même appareil (chaque joueur joue une manche) Classement sauvegardé dans localStorageavec les 10 meilleurs scores
+
+Avion contrôlé en maintenant appuyé ((touche espace pour PC) / tap)
+Météo 3 phases : Clair → Nuageux → Orageux
+Oiseaux en 3 types : normal, plongeur, formation
+Éclairs mortels pendentif l'orage

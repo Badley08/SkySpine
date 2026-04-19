@@ -1,0 +1,19 @@
+{
+  "name": "SkySpine",
+  "short_name": "SkySpine",
+  "description": "Jeu d'avion 2D - Evite les oiseaux et les eclairs",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0e1a",
+  "theme_color": "#1a2a4a",
+  "icons": [
+    {
+      "src": "/assets/skypine.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

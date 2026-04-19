@@ -1,0 +1,201 @@
+/* -------------------------------------------------------
+   SkySpine - Components
+   Je definis les boutons, inputs, et elements reutilisables.
+   ------------------------------------------------------- */
+
+/* -- Boutons -- */
+.btn {
+    width: 100%;
+    padding: 14px 24px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.3px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    color: #0a0e1a;
+    box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.btn-secondary {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid #334155;
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
+    background: #253045;
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.btn-danger:active {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border: 1px solid #334155;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.btn-icon:active {
+    transform: scale(0.9);
+    background: #253045;
+}
+
+.btn-icon .icon {
+    width: 20px;
+    height: 20px;
+    filter: invert(1);
+}
+
+/* -- Input -- */
+.input-field {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border: 1px solid #334155;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.input-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.input-field::placeholder {
+    color: var(--text-muted);
+}
+
+/* -- Label -- */
+.label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* -- Plane Selector -- */
+.plane-selector {
+    display: flex;
+    gap: 12px;
+}
+
+.plane-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    background: var(--bg-card);
+    border: 2px solid #334155;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.plane-option img {
+    width: 72px;
+    height: auto;
+}
+
+.plane-option span {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.plane-option.selected {
+    border-color: var(--accent);
+    background: rgba(56, 189, 248, 0.08);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.plane-option.selected span {
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.plane-option:active {
+    transform: scale(0.96);
+}
+
+/* -- Leaderboard Entry -- */
+.lb-entry {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid #1e293b;
+}
+
+.lb-rank {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    background: #334155;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.lb-entry:nth-child(1) .lb-rank {
+    background: linear-gradient(135deg, var(--gold), #f59e0b);
+    color: #0a0e1a;
+}
+
+.lb-entry:nth-child(2) .lb-rank {
+    background: linear-gradient(135deg, var(--silver), #cbd5e1);
+    color: #0a0e1a;
+}
+
+.lb-entry:nth-child(3) .lb-rank {
+    background: linear-gradient(135deg, var(--bronze), #b45309);
+    color: #fff;
+}
+
+.lb-name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.lb-score {
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}

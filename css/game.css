@@ -1,0 +1,68 @@
+/* -------------------------------------------------------
+   SkySpine - Game HUD
+   Je definis les styles du canvas et de l'overlay en jeu.
+   ------------------------------------------------------- */
+
+#screen-game {
+    background: #000;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.game-hud {
+    position: fixed;
+    top: env(safe-area-inset-top, 12px);
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.hud-score {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+    font-variant-numeric: tabular-nums;
+}
+
+.hud-weather {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
+    padding: 4px 14px;
+    border-radius: 20px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.game-pause-hint {
+    position: fixed;
+    bottom: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    pointer-events: none;
+    z-index: 20;
+    animation: hintPulse 1.5s ease-in-out infinite;
+    white-space: nowrap;
+}
+
+.game-pause-hint.hidden {
+    display: none;
+}
+
+@keyframes hintPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}

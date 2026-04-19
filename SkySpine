@@ -1,0 +1,10 @@
+Un jeu d'avion 2D comme celui de Google avec le parasol, on doit éviter des oiseaux, après 5 minutes le temps change pour devenir orageux et il faut éviter les éclairs. Le jeu sera une boucle infinie avec un compteur pour le score.
+
+7 - Fonctionnalités utiles : Mode multijoueur local : possibilité de changer le nom du pilote qui sera affiché en classement.
+Ex : 1 = Samuel : 7599 mètres, 2 = Joseph : 7498 mètres, 3 = Karlito : 7200 mètres etc.
+
+2 - Fonctionnalités utiles : Vu que le projet est un site web et que on veut jouer sans internet, on va devoir télécharger les dossiers, fichiers localement depuis les paramètres du jeu sans besoin de lancer npm run dev parce que nous serions principalement sur iOS (on doit pas oublier Android, j'ai Android).
+
+Chargement du jeux : on doit voir : idée par Samuel Alonso, codé par Karlito.
+
+Je pense à ajouter des sons gratuits qui sont sur d'autres sites web.

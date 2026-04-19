@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a2a4a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="SkySpine - Jeu d'avion 2D. Evite les oiseaux et les eclairs!">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/skypine.png">
+    <link rel="apple-touch-icon" href="assets/skypine.png">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/screens.css">
+    <link rel="stylesheet" href="css/game.css">
+    <title>SkySpine</title>
+</head>
+<body>
+
+    <!-- Ecran de chargement -->
+    <div id="screen-loading" class="screen active">
+        <div class="loading-content">
+            <img src="assets/skypine.png" alt="SkySpine Logo" class="loading-logo" id="loading-logo">
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+            <p class="loading-percent" id="loading-percent">0%</p>
+            <p class="loading-credits">Idee par Samuel Alonso, code par Karlito</p>
+        </div>
+    </div>
+
+    <!-- Menu Principal -->
+    <div id="screen-menu" class="screen">
+        <div class="menu-content">
+            <img src="assets/skypine.png" alt="SkySpine" class="menu-logo">
+            <div class="menu-pilot">
+                <label class="label" for="pilot-name">Nom du pilote</label>
+                <input type="text" id="pilot-name" class="input-field" maxlength="15" placeholder="Entrez votre nom" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" id="btn-play">Jouer</button>
+            <button class="btn btn-secondary" id="btn-leaderboard">Classement</button>
+            <div class="menu-bottom-bar">
+                <button class="btn-icon" id="btn-settings" aria-label="Parametres">
+                    <img src="assets/svg/gear-solid-full.svg" alt="Parametres" class="icon">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran Parametres -->
+    <div id="screen-settings" class="screen">
+        <div class="settings-content">
+            <div class="settings-header">
+                <button class="btn-icon" id="btn-settings-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Parametres</h2>
+            </div>
+            <div class="settings-section">
+                <h3>Choix de l'avion</h3>
+                <div class="plane-selector">
+                    <button class="plane-option selected" id="plane-biplane" data-plane="biplane">
+                        <img src="assets/biplane.png" alt="Biplan rouge">
+                        <span>Biplan</span>
+                    </button>
+                    <button class="plane-option" id="plane-blue" data-plane="avion_bleu">
+                        <img src="assets/avion_bleu.png" alt="Avion bleu">
+                        <span>Bleu</span>
+                    </button>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Donnees</h3>
+                <button class="btn btn-danger" id="btn-clear-scores">Effacer les scores</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran Classement -->
+    <div id="screen-leaderboard" class="screen">
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <button class="btn-icon" id="btn-leaderboard-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Classement</h2>
+            </div>
+            <div class="leaderboard-list" id="leaderboard-list">
+                <p class="leaderboard-empty">Aucun score enregistre</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran de Jeu (Canvas) -->
+    <div id="screen-game" class="screen">
+        <canvas id="game-canvas"></canvas>
+        <div class="game-hud">
+            <div class="hud-score" id="hud-score">0 m</div>
+            <div class="hud-weather" id="hud-weather">Clair</div>
+        </div>
+        <div class="game-pause-hint" id="pause-hint">Appuyez pour commencer</div>
+    </div>
+
+    <!-- Ecran Game Over -->
+    <div id="screen-gameover" class="screen">
+        <div class="gameover-content">
+            <h2>Fin du vol</h2>
+            <div class="gameover-score">
+                <span class="gameover-label">Distance</span>
+                <span class="gameover-value" id="gameover-distance">0 m</span>
+            </div>
+            <div class="gameover-pilot">
+                <span class="gameover-label">Pilote</span>
+                <span class="gameover-value" id="gameover-pilot">---</span>
+            </div>
+            <div class="gameover-rank">
+                <span class="gameover-label">Rang</span>
+                <span class="gameover-value" id="gameover-rank">#-</span>
+            </div>
+            <button class="btn btn-primary" id="btn-retry">Rejouer</button>
+            <button class="btn btn-secondary" id="btn-back-menu">Menu</button>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

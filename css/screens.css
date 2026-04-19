@@ -1,0 +1,251 @@
+/* -------------------------------------------------------
+   SkySpine - Screens
+   Je definis les layouts de chaque ecran du jeu.
+   ------------------------------------------------------- */
+
+/* -- Systeme d'ecrans -- */
+.screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    z-index: 1;
+}
+
+.screen.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 10;
+}
+
+/* -- Ecran de chargement -- */
+#screen-loading {
+    background: var(--bg-dark);
+    z-index: 100;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 32px;
+}
+
+.loading-logo {
+    width: 180px;
+    height: auto;
+    animation: logoPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px var(--accent-glow));
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+.loading-bar-container {
+    width: 240px;
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #818cf8);
+    border-radius: 3px;
+    transition: width 0.15s ease;
+}
+
+.loading-percent {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.loading-credits {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+/* -- Menu -- */
+#screen-menu {
+    background: linear-gradient(180deg, #0a0e1a 0%, #101830 100%);
+}
+
+.menu-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.menu-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 24px var(--accent-glow));
+}
+
+.menu-pilot {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-bottom-bar {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* -- Parametres -- */
+#screen-settings {
+    background: var(--bg-dark);
+}
+
+.settings-content {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    height: 100%;
+    padding-top: env(safe-area-inset-top, 24px);
+}
+
+.settings-header,
+.leaderboard-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-header h2,
+.leaderboard-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-section h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* -- Classement -- */
+#screen-leaderboard {
+    background: var(--bg-dark);
+}
+
+.leaderboard-content {
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    padding-top: env(safe-area-inset-top, 24px);
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 24px;
+}
+
+.leaderboard-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px 0;
+}
+
+/* -- Game Over -- */
+#screen-gameover {
+    background: rgba(10, 14, 26, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.gameover-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 340px;
+}
+
+.gameover-content h2 {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gameover-score,
+.gameover-pilot,
+.gameover-rank {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid #1e293b;
+}
+
+.gameover-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.gameover-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+#gameover-distance {
+    color: var(--accent);
+}
+
+/* -- Animations -- */
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.screen.active .menu-content,
+.screen.active .gameover-content {
+    animation: slideUp 0.4s ease-out;
+}
