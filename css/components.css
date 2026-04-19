@@ -1,6 +1,6 @@
 /* -------------------------------------------------------
    SkySpine - Components
-   Je definis les boutons, inputs, et elements reutilisables.
+   Boutons, inputs, elements reutilisables.
    ------------------------------------------------------- */
 
 /* -- Boutons -- */
@@ -9,43 +9,67 @@
     padding: 14px 24px;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition);
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
+    font-family: var(--font);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #818cf8);
-    color: #0a0e1a;
-    box-shadow: 0 4px 16px var(--accent-glow);
+    background: linear-gradient(135deg, var(--accent) 0%, #0ea5e9 100%);
+    color: #04080f;
+    box-shadow: 0 4px 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 28px var(--accent-glow);
+    transform: translateY(-1px);
 }
 
 .btn-primary:active {
-    transform: scale(0.97);
-    box-shadow: 0 2px 8px var(--accent-glow);
+    transform: scale(0.97) translateY(0);
+    box-shadow: 0 2px 10px var(--accent-glow);
 }
 
 .btn-secondary {
     background: var(--bg-card);
     color: var(--text-primary);
-    border: 1px solid #334155;
+    border: 1px solid var(--border-light);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-light);
 }
 
 .btn-secondary:active {
     transform: scale(0.97);
-    background: #253045;
 }
 
 .btn-danger {
-    background: transparent;
+    background: var(--danger-dim);
     color: var(--danger);
-    border: 1px solid var(--danger);
+    border: 1px solid rgba(239,68,68,0.3);
+}
+
+.btn-danger:hover {
+    background: rgba(239,68,68,0.18);
 }
 
 .btn-danger:active {
-    background: rgba(239, 68, 68, 0.1);
+    transform: scale(0.97);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--gold) 0%, #d97706 100%);
+    color: #04080f;
+    box-shadow: 0 4px 20px var(--gold-dim);
+}
+
+.btn-gold:active {
+    transform: scale(0.97);
 }
 
 .btn-icon {
@@ -55,34 +79,54 @@
     align-items: center;
     justify-content: center;
     background: var(--bg-card);
-    border: 1px solid #334155;
+    border: 1px solid var(--border-light);
     border-radius: 50%;
     cursor: pointer;
     transition: all var(--transition);
+    color: var(--text-secondary);
+}
+
+.btn-icon:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--border-light);
 }
 
 .btn-icon:active {
-    transform: scale(0.9);
-    background: #253045;
+    transform: scale(0.88);
 }
 
 .btn-icon .icon {
     width: 20px;
     height: 20px;
-    filter: invert(1);
+    filter: invert(0.7);
+}
+
+.btn-icon .icon-svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+}
+
+.icon-svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    fill: none;
 }
 
 /* -- Input -- */
 .input-field {
     width: 100%;
-    padding: 12px 16px;
+    padding: 13px 16px;
     background: var(--bg-card);
-    border: 1px solid #334155;
+    border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
     color: var(--text-primary);
-    font-size: 16px;
+    font-size: 15px;
     outline: none;
-    transition: border-color var(--transition);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    font-family: var(--font);
 }
 
 .input-field:focus {
@@ -96,55 +140,74 @@
 
 /* -- Label -- */
 .label {
-    font-size: 13px;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.7px;
 }
 
-/* -- Plane Selector -- */
-.plane-selector {
+/* -- Toggle Switch -- */
+.toggle-row {
     display: flex;
-    gap: 12px;
-}
-
-.plane-option {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 16px 12px;
-    background: var(--bg-card);
-    border: 2px solid #334155;
-    border-radius: var(--radius);
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 26px;
     cursor: pointer;
-    transition: all var(--transition);
 }
 
-.plane-option img {
-    width: 72px;
-    height: auto;
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-.plane-option span {
-    font-size: 13px;
-    color: var(--text-secondary);
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border-light);
+    border-radius: 13px;
+    transition: background var(--transition);
 }
 
-.plane-option.selected {
-    border-color: var(--accent);
-    background: rgba(56, 189, 248, 0.08);
-    box-shadow: 0 0 0 3px var(--accent-glow);
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--transition);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
 }
 
-.plane-option.selected span {
-    color: var(--accent);
-    font-weight: 600;
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--accent);
 }
 
-.plane-option:active {
-    transform: scale(0.96);
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+}
+
+/* -- Coin Icon -- */
+.coin-icon-small {
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle at 40% 35%, var(--gold), #b45309);
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(245,158,11,0.5);
 }
 
 /* -- Leaderboard Entry -- */
@@ -152,50 +215,253 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 16px;
+    padding: 12px 14px;
     background: var(--bg-card);
     border-radius: var(--radius-sm);
-    border: 1px solid #1e293b;
+    border: 1px solid var(--border);
+    transition: background var(--transition);
+}
+
+.lb-entry.lb-mine {
+    border-color: var(--accent);
+    background: var(--accent-dim);
 }
 
 .lb-rank {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    background: #334155;
-    color: var(--text-primary);
+    background: var(--border-light);
+    color: var(--text-secondary);
     flex-shrink: 0;
 }
 
-.lb-entry:nth-child(1) .lb-rank {
-    background: linear-gradient(135deg, var(--gold), #f59e0b);
-    color: #0a0e1a;
-}
-
-.lb-entry:nth-child(2) .lb-rank {
-    background: linear-gradient(135deg, var(--silver), #cbd5e1);
-    color: #0a0e1a;
-}
-
-.lb-entry:nth-child(3) .lb-rank {
-    background: linear-gradient(135deg, var(--bronze), #b45309);
-    color: #fff;
-}
+.lb-entry.rank-1 .lb-rank { background: linear-gradient(135deg, #f59e0b, #d97706); color: #04080f; }
+.lb-entry.rank-2 .lb-rank { background: linear-gradient(135deg, #94a3b8, #64748b); color: #04080f; }
+.lb-entry.rank-3 .lb-rank { background: linear-gradient(135deg, #b45309, #7c2d12); color: #fff; }
 
 .lb-name {
     flex: 1;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .lb-score {
     font-size: 14px;
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* -- Garage card -- */
+.garage-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 12px;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    position: relative;
+}
+
+.garage-card.active-plane {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.garage-card.locked {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.garage-card img {
+    width: 70px;
+    height: auto;
+}
+
+.garage-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.garage-card-status {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.garage-card.active-plane .garage-card-status {
+    color: var(--accent);
+}
+
+.garage-lock-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: var(--radius);
+    background: rgba(7,9,15,0.7);
+}
+
+.garage-lock-icon {
+    font-size: 20px;
+    opacity: 0.7;
+}
+
+.garage-unlock-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0 4px;
+    line-height: 1.4;
+}
+
+.garage-select-btn {
+    font-size: 12px;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition);
+}
+
+/* -- Quest card -- */
+.quest-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quest-card.completed {
+    border-color: var(--success);
+    background: var(--success-dim);
+}
+
+.quest-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.quest-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.quest-reward {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.quest-progress-bar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.quest-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.quest-card.completed .quest-progress-fill {
+    background: var(--success);
+}
+
+.quest-progress-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* -- Active plane card (settings) -- */
+.active-plane-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+}
+
+.active-plane-card img {
+    width: 60px;
+    height: auto;
+}
+
+.active-plane-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+}
+
+.active-plane-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 3px;
+}
+
+/* -- Tabs -- */
+.lb-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+}
+
+.lb-tab {
+    flex: 1;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+}
+
+.lb-tab.active {
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }

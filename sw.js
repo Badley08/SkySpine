@@ -1,93 +1,82 @@
 // -------------------------------------------------------
 // SkySpine - Service Worker
-// Je gere le cache hors ligne pour que le jeu fonctionne
-// sans connexion internet apres le premier chargement.
+// Cache hors ligne - strategie cache-first.
 // -------------------------------------------------------
 
-const CACHE_NAME = 'skyspine-v2';
+const CACHE_NAME = 'skyspine-v3';
 
-// Je liste tous les fichiers que je dois mettre en cache
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+    '/',
+    '/index.html',
+    '/manifest.json',
 
-  // CSS
-  '/css/base.css',
-  '/css/components.css',
-  '/css/screens.css',
-  '/css/game.css',
+    '/css/base.css',
+    '/css/components.css',
+    '/css/screens.css',
+    '/css/game.css',
 
-  // JS modules
-  '/js/app.js',
-  '/js/db.js',
-  '/js/assets.js',
-  '/js/controls.js',
-  '/js/weather.js',
-  '/js/obstacles.js',
-  '/js/collision.js',
-  '/js/renderer.js',
-  '/js/game.js',
+    '/js/app.js',
+    '/js/db.js',
+    '/js/assets.js',
+    '/js/controls.js',
+    '/js/weather.js',
+    '/js/obstacles.js',
+    '/js/collision.js',
+    '/js/renderer.js',
+    '/js/game.js',
+    '/js/firebase.js',
+    '/js/planes.js',
+    '/js/quests.js',
+    '/js/sound.js',
 
-  // Images
-  '/assets/biplane.png',
-  '/assets/avion_bleu.png',
-  '/assets/explosion_2d.png',
-  '/assets/skypine.png',
-  '/assets/backgrounds/background_plage.png',
-  '/assets/backgrounds/village.png',
-  '/assets/ennemis/avion_rouge.png',
-  '/assets/ennemis/nuage_eclair.png',
-  '/assets/ennemis/oiseau_1_gauche.png',
-  '/assets/ennemis/oiseau_2_gauche.png',
+    '/assets/biplane.png',
+    '/assets/avion_bleu.png',
+    '/assets/explosion_2d.png',
+    '/assets/skypine.png',
+    '/assets/backgrounds/background_plage.png',
+    '/assets/backgrounds/village.png',
+    '/assets/ennemis/avion_rouge.png',
+    '/assets/ennemis/nuage_eclair.png',
+    '/assets/ennemis/oiseau_1_gauche.png',
+    '/assets/ennemis/oiseau_2_gauche.png',
 
-  // SVG
-  '/assets/svg/chevron-left.svg',
-  '/assets/svg/download-cloud.svg',
-  '/assets/svg/gear-solid-full.svg',
-  '/assets/svg/house-regular-full.svg'
+    '/assets/svg/chevron-left.svg',
+    '/assets/svg/download-cloud.svg',
+    '/assets/svg/gear-solid-full.svg',
+    '/assets/svg/house-regular-full.svg'
 ];
 
-// Je mets tout en cache lors de l'installation
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-  self.skipWaiting();
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    );
+    self.skipWaiting();
 });
 
-// Je supprime les anciens caches
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    })
-  );
-  self.clients.claim();
+    event.waitUntil(
+        caches.keys().then((cacheNames) =>
+            Promise.all(cacheNames.filter(n => n !== CACHE_NAME).map(n => caches.delete(n)))
+        )
+    );
+    self.clients.claim();
 });
 
-// Je sers les fichiers depuis le cache en priorite (cache-first)
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return networkResponse;
-      });
-    })
-  );
+    if (event.request.url.includes('firestore.googleapis.com') ||
+        event.request.url.includes('firebase')) {
+        return;
+    }
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            return fetch(event.request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+                }
+                return networkResponse;
+            });
+        })
+    );
 });
