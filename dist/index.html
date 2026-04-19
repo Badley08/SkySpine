@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="SkySpine - Jeu d'avion 2D. Evite les oiseaux et les eclairs!">
+    <link rel="manifest" href="/assets/manifest-DluBjMMk.json">
+    <link rel="icon" type="image/png" href="/assets/skypine-WcOns8bv.png">
+    <link rel="apple-touch-icon" href="/assets/skypine-WcOns8bv.png">
+    <title>SkySpine</title>
+  <script type="module" crossorigin src="/assets/main-5-PlxrKw.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/main-BHbl9LKj.css">
+</head>
+<body>
+
+    <!-- Ecran de chargement -->
+    <div id="screen-loading" class="screen active">
+        <div class="loading-content">
+            <div class="loading-logo-block">
+                <img src="/assets/skypine-WcOns8bv.png" alt="SkySpine Logo" class="loading-logo" id="loading-logo">
+                <h1 class="loading-game-title">SkySpine</h1>
+            </div>
+            <div class="loading-credits-block">
+                <p class="loading-credits-line">Une idee de <span class="credits-name">Samuel Alonso</span></p>
+                <p class="loading-credits-line">Code par <span class="credits-name">Karlito</span></p>
+            </div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+            <p class="loading-percent" id="loading-percent">0%</p>
+        </div>
+    </div>
+
+    <!-- Menu Principal -->
+    <div id="screen-menu" class="screen">
+        <canvas id="menu-canvas" class="menu-bg-canvas"></canvas>
+        <div class="menu-content">
+            <div class="menu-header">
+                <img src="/assets/skypine-WcOns8bv.png" alt="SkySpine" class="menu-logo">
+                <h1 class="menu-title">SkySpine</h1>
+                <p class="menu-tagline">Le ciel t'appartient</p>
+            </div>
+            <div class="menu-pilot">
+                <label class="label" for="pilot-name">Nom du pilote</label>
+                <input type="text" id="pilot-name" class="input-field" maxlength="15" placeholder="Entrez votre nom" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" id="btn-play">Jouer</button>
+            <button class="btn btn-secondary" id="btn-leaderboard">Classement</button>
+            <div class="menu-bottom-bar">
+                <button class="btn-icon" id="btn-settings" aria-label="Parametres">
+                    <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20640%20640'%3e%3c!--!Font%20Awesome%20Free%207.2.0%20by%20@fontawesome%20-%20https://fontawesome.com%20License%20-%20https://fontawesome.com/license/free%20Copyright%202026%20Fonticons,%20Inc.--%3e%3cpath%20d='M259.1%2073.5C262.1%2058.7%20275.2%2048%20290.4%2048L350.2%2048C365.4%2048%20378.5%2058.7%20381.5%2073.5L396%20143.5C410.1%20149.5%20423.3%20157.2%20435.3%20166.3L503.1%20143.8C517.5%20139%20533.3%20145%20540.9%20158.2L570.8%20210C578.4%20223.2%20575.7%20239.8%20564.3%20249.9L511%20297.3C511.9%20304.7%20512.3%20312.3%20512.3%20320C512.3%20327.7%20511.8%20335.3%20511%20342.7L564.4%20390.2C575.8%20400.3%20578.4%20417%20570.9%20430.1L541%20481.9C533.4%20495%20517.6%20501.1%20503.2%20496.3L435.4%20473.8C423.3%20482.9%20410.1%20490.5%20396.1%20496.6L381.7%20566.5C378.6%20581.4%20365.5%20592%20350.4%20592L290.6%20592C275.4%20592%20262.3%20581.3%20259.3%20566.5L244.9%20496.6C230.8%20490.6%20217.7%20482.9%20205.6%20473.8L137.5%20496.3C123.1%20501.1%20107.3%20495.1%2099.7%20481.9L69.8%20430.1C62.2%20416.9%2064.9%20400.3%2076.3%20390.2L129.7%20342.7C128.8%20335.3%20128.4%20327.7%20128.4%20320C128.4%20312.3%20128.9%20304.7%20129.7%20297.3L76.3%20249.8C64.9%20239.7%2062.3%20223%2069.8%20209.9L99.7%20158.1C107.3%20144.9%20123.1%20138.9%20137.5%20143.7L205.3%20166.2C217.4%20157.1%20230.6%20149.5%20244.6%20143.4L259.1%2073.5zM320.3%20400C364.5%20399.8%20400.2%20363.9%20400%20319.7C399.8%20275.5%20363.9%20239.8%20319.7%20240C275.5%20240.2%20239.8%20276.1%20240%20320.3C240.2%20364.5%20276.1%20400.2%20320.3%20400z'/%3e%3c/svg%3e" alt="Parametres" class="icon">
+                </button>
+                <button class="btn-icon" id="btn-garage" aria-label="Hangar">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="btn-quests" aria-label="Quetes">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="9" y1="13" x2="15" y2="13"/>
+                        <line x1="9" y1="17" x2="12" y2="17"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="menu-coins-bar">
+                <div class="coin-icon-small"></div>
+                <span id="menu-coins-display">0</span>
+                <span class="coins-label">SpineCoins</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran Parametres -->
+    <div id="screen-settings" class="screen">
+        <div class="settings-content">
+            <div class="settings-header">
+                <button class="btn-icon" id="btn-settings-back" aria-label="Retour">
+                    <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='lucide%20lucide-chevron-left-icon%20lucide-chevron-left'%3e%3cpath%20d='m15%2018-6-6%206-6'/%3e%3c/svg%3e" alt="Retour" class="icon">
+                </button>
+                <h2>Parametres</h2>
+            </div>
+            <div class="settings-section">
+                <h3>Avion actif</h3>
+                <div class="active-plane-card">
+                    <img id="active-plane-img" src="/assets/biplane-BCHicUCB.png" alt="Avion">
+                    <div class="active-plane-info">
+                        <span id="active-plane-name" class="active-plane-name">Spine-01</span>
+                        <span class="active-plane-sub">Avion actif &mdash; voir le Hangar pour changer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Audio</h3>
+                <div class="toggle-row">
+                    <span>Sons du jeu</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-sound" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Donnees</h3>
+                <button class="btn btn-danger" id="btn-clear-scores">Effacer les scores locaux</button>
+            </div>
+            <div class="settings-credits">
+                <p>Une idee de <strong>Samuel Alonso</strong></p>
+                <p>Code par <strong>Karlito</strong></p>
+                <p class="version-label">Version 2.0 &mdash; SkySpine</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran Hangar (Garage) -->
+    <div id="screen-garage" class="screen">
+        <div class="garage-content">
+            <div class="garage-header">
+                <button class="btn-icon" id="btn-garage-back" aria-label="Retour">
+                    <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='lucide%20lucide-chevron-left-icon%20lucide-chevron-left'%3e%3cpath%20d='m15%2018-6-6%206-6'/%3e%3c/svg%3e" alt="Retour" class="icon">
+                </button>
+                <h2>Hangar</h2>
+                <div class="garage-coins">
+                    <div class="coin-icon-small"></div>
+                    <span id="garage-coins-display">0</span>
+                </div>
+            </div>
+            <div class="garage-grid" id="garage-grid"></div>
+        </div>
+    </div>
+
+    <!-- Ecran Quetes -->
+    <div id="screen-quests" class="screen">
+        <div class="quests-content">
+            <div class="quests-header">
+                <button class="btn-icon" id="btn-quests-back" aria-label="Retour">
+                    <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='lucide%20lucide-chevron-left-icon%20lucide-chevron-left'%3e%3cpath%20d='m15%2018-6-6%206-6'/%3e%3c/svg%3e" alt="Retour" class="icon">
+                </button>
+                <h2>Quetes</h2>
+            </div>
+            <div class="quests-list" id="quests-list"></div>
+        </div>
+    </div>
+
+    <!-- Ecran Classement -->
+    <div id="screen-leaderboard" class="screen">
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <button class="btn-icon" id="btn-leaderboard-back" aria-label="Retour">
+                    <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='currentColor'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%20class='lucide%20lucide-chevron-left-icon%20lucide-chevron-left'%3e%3cpath%20d='m15%2018-6-6%206-6'/%3e%3c/svg%3e" alt="Retour" class="icon">
+                </button>
+                <h2>Classement</h2>
+            </div>
+            <div class="lb-tabs">
+                <button class="lb-tab active" id="tab-global">Mondial</button>
+                <button class="lb-tab" id="tab-local">Local</button>
+            </div>
+            <div class="leaderboard-list" id="leaderboard-list">
+                <p class="leaderboard-empty">Chargement...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ecran de Jeu (Canvas) -->
+    <div id="screen-game" class="screen">
+        <canvas id="game-canvas"></canvas>
+        <div class="game-hud">
+            <div class="hud-left">
+                <div class="hud-score" id="hud-score">0 m</div>
+                <div class="hud-coins-earned" id="hud-coins">+0 SC</div>
+            </div>
+            <div class="hud-right">
+                <div class="hud-weather" id="hud-weather">Clair</div>
+                <div class="hud-wind" id="hud-wind"></div>
+            </div>
+        </div>
+        <div class="game-pause-hint" id="pause-hint">Appuyez pour commencer</div>
+        <button class="hud-pause-btn" id="hud-pause-btn" aria-label="Pause">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Overlay Pause -->
+    <div id="screen-pause" class="screen overlay-screen">
+        <div class="pause-content">
+            <h2>Pause</h2>
+            <button class="btn btn-primary" id="btn-resume">Reprendre</button>
+            <button class="btn btn-secondary" id="btn-pause-menu">Menu</button>
+        </div>
+    </div>
+
+    <!-- Ecran Game Over -->
+    <div id="screen-gameover" class="screen">
+        <div class="gameover-content">
+            <div class="gameover-title-block">
+                <h2>Fin du vol</h2>
+                <p class="gameover-sub" id="gameover-cause">Collision</p>
+            </div>
+            <div class="gameover-stats">
+                <div class="gameover-stat">
+                    <span class="gameover-label">Distance</span>
+                    <span class="gameover-value accent" id="gameover-distance">0 m</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">Pilote</span>
+                    <span class="gameover-value" id="gameover-pilot">---</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">Rang</span>
+                    <span class="gameover-value" id="gameover-rank">#-</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">SpineCoins gagnes</span>
+                    <span class="gameover-value gold" id="gameover-coins">+0</span>
+                </div>
+                <div class="gameover-stat" id="gameover-quest-block" style="display:none">
+                    <span class="gameover-label">Quete completee !</span>
+                    <span class="gameover-value accent" id="gameover-quest-name"></span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-retry">Rejouer</button>
+            <button class="btn btn-secondary" id="btn-back-menu">Menu</button>
+        </div>
+    </div>
+
+    <!-- Overlay Hacker Banni -->
+    <div id="screen-banned" class="screen overlay-screen">
+        <div class="banned-content">
+            <div class="banned-icon-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <h2 class="banned-title">HACKER DETECTE</h2>
+            <p class="banned-pilot" id="banned-pilot-name">Samuel</p>
+            <p class="banned-desc">a ete banni pour 2 minutes.</p>
+            <div class="banned-timer-block">
+                <span class="banned-timer-label">Temps restant</span>
+                <span class="banned-timer" id="banned-timer">2:00</span>
+            </div>
+            <div class="banned-separator">ou changer de pilote pour continuer</div>
+            <div class="banned-name-change">
+                <input type="text" id="banned-new-name" class="input-field" maxlength="15" placeholder="Nouveau nom de pilote" autocomplete="off">
+                <button class="btn btn-primary" id="btn-banned-play">Jouer sous ce nom</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
