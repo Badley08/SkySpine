@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkySpine - Telecharger le projet</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#07090f;color:#eef2f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.card{background:#131922;border:1px solid #1e2a3a;border-radius:14px;padding:40px 32px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:20px}
+h1{font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff 0%,#38bdf8 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+p{color:#7a8fa8;font-size:14px;line-height:1.6}
+.btn{padding:14px 24px;border:none;border-radius:9px;font-size:15px;font-weight:600;cursor:pointer;transition:all .22s ease;font-family:inherit;width:100%}
+.btn-primary{background:linear-gradient(135deg,#38bdf8 0%,#0ea5e9 100%);color:#04080f;box-shadow:0 4px 20px rgba(56,189,248,0.28)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(56,189,248,0.4)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-primary:disabled{opacity:0.5;cursor:default;transform:none}
+.status{font-size:13px;color:#38bdf8;min-height:20px}
+.file-list{background:#0d1117;border:1px solid #1e2a3a;border-radius:9px;padding:16px;text-align:left;font-size:12px;color:#3d4e62;line-height:2;max-height:200px;overflow-y:auto}
+.file-list span{color:#7a8fa8}
+</style>
+</head>
+<body>
+<div class="card">
+    <div>
+        <h1>SkySpine</h1>
+        <p style="margin-top:8px">Telecharge tous les fichiers du projet en un seul ZIP, pret pour Netlify.</p>
+    </div>
+
+    <div class="file-list" id="file-list">
+        <span>Chargement des fichiers...</span>
+    </div>
+
+    <p class="status" id="status"></p>
+
+    <button class="btn btn-primary" id="btn-download" onclick="generateZip()">
+        Telecharger SkySpine.zip
+    </button>
+</div>
+
+<script>
+const FILES = {
+  'index.html': `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="SkySpine - Jeu d'avion 2D. Evite les oiseaux et les eclairs!">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/skypine.png">
+    <link rel="apple-touch-icon" href="assets/skypine.png">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/screens.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/game.css">
+    <title>SkySpine</title>
+</head>
+<body>
+    <div id="screen-loading" class="screen active">
+        <div class="loading-content">
+            <div class="loading-logo-block">
+                <img src="assets/skypine.png" alt="SkySpine Logo" class="loading-logo" id="loading-logo">
+                <h1 class="loading-game-title">SkySpine</h1>
+            </div>
+            <div class="loading-credits-block">
+                <p class="loading-credits-line">Une idee de <span class="credits-name">Samuel Alonso</span></p>
+                <p class="loading-credits-line">Code par <span class="credits-name">Karlito</span></p>
+            </div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+            <p class="loading-percent" id="loading-percent">0%</p>
+        </div>
+    </div>
+    <div id="screen-menu" class="screen">
+        <canvas id="menu-canvas" class="menu-bg-canvas"></canvas>
+        <div class="menu-content">
+            <div class="menu-header">
+                <img src="assets/skypine.png" alt="SkySpine" class="menu-logo">
+                <h1 class="menu-title">SkySpine</h1>
+                <p class="menu-tagline">Le ciel t'appartient</p>
+            </div>
+            <div class="menu-pilot">
+                <label class="label" for="pilot-name">Nom du pilote</label>
+                <input type="text" id="pilot-name" class="input-field" maxlength="15" placeholder="Entrez votre nom" autocomplete="off">
+            </div>
+            <button class="btn btn-primary" id="btn-play">Jouer</button>
+            <button class="btn btn-secondary" id="btn-leaderboard">Classement</button>
+            <div class="menu-bottom-bar">
+                <button class="btn-icon" id="btn-settings" aria-label="Parametres">
+                    <img src="assets/svg/gear-solid-full.svg" alt="Parametres" class="icon">
+                </button>
+                <button class="btn-icon" id="btn-garage" aria-label="Hangar">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="btn-quests" aria-label="Quetes">
+                    <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="9" y1="13" x2="15" y2="13"/>
+                        <line x1="9" y1="17" x2="12" y2="17"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="menu-coins-bar">
+                <div class="coin-icon-small"></div>
+                <span id="menu-coins-display">0</span>
+                <span class="coins-label">SpineCoins</span>
+            </div>
+        </div>
+    </div>
+    <div id="screen-settings" class="screen">
+        <div class="settings-content">
+            <div class="settings-header">
+                <button class="btn-icon" id="btn-settings-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Parametres</h2>
+            </div>
+            <div class="settings-section">
+                <h3>Avion actif</h3>
+                <div class="active-plane-card">
+                    <img id="active-plane-img" src="assets/biplane.png" alt="Avion">
+                    <div class="active-plane-info">
+                        <span id="active-plane-name" class="active-plane-name">Spine-01</span>
+                        <span class="active-plane-sub">Avion actif &mdash; voir le Hangar pour changer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Audio</h3>
+                <div class="toggle-row">
+                    <span>Sons du jeu</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-sound" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Donnees</h3>
+                <button class="btn btn-danger" id="btn-clear-scores">Effacer les scores locaux</button>
+            </div>
+            <div class="settings-credits">
+                <p>Une idee de <strong>Samuel Alonso</strong></p>
+                <p>Code par <strong>Karlito</strong></p>
+                <p class="version-label">Version 2.0 &mdash; SkySpine</p>
+            </div>
+        </div>
+    </div>
+    <div id="screen-garage" class="screen">
+        <div class="garage-content">
+            <div class="garage-header">
+                <button class="btn-icon" id="btn-garage-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Hangar</h2>
+                <div class="garage-coins">
+                    <div class="coin-icon-small"></div>
+                    <span id="garage-coins-display">0</span>
+                </div>
+            </div>
+            <div class="garage-grid" id="garage-grid"></div>
+        </div>
+    </div>
+    <div id="screen-quests" class="screen">
+        <div class="quests-content">
+            <div class="quests-header">
+                <button class="btn-icon" id="btn-quests-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Quetes</h2>
+            </div>
+            <div class="quests-list" id="quests-list"></div>
+        </div>
+    </div>
+    <div id="screen-leaderboard" class="screen">
+        <div class="leaderboard-content">
+            <div class="leaderboard-header">
+                <button class="btn-icon" id="btn-leaderboard-back" aria-label="Retour">
+                    <img src="assets/svg/chevron-left.svg" alt="Retour" class="icon">
+                </button>
+                <h2>Classement</h2>
+            </div>
+            <div class="lb-tabs">
+                <button class="lb-tab active" id="tab-global">Mondial</button>
+                <button class="lb-tab" id="tab-local">Local</button>
+            </div>
+            <div class="leaderboard-list" id="leaderboard-list">
+                <p class="leaderboard-empty">Chargement...</p>
+            </div>
+        </div>
+    </div>
+    <div id="screen-game" class="screen">
+        <canvas id="game-canvas"></canvas>
+        <div class="game-hud">
+            <div class="hud-left">
+                <div class="hud-score" id="hud-score">0 m</div>
+                <div class="hud-coins-earned" id="hud-coins">+0 SC</div>
+            </div>
+            <div class="hud-right">
+                <div class="hud-weather" id="hud-weather">Clair</div>
+                <div class="hud-wind" id="hud-wind"></div>
+            </div>
+        </div>
+        <div class="game-pause-hint" id="pause-hint">Appuyez pour commencer</div>
+        <button class="hud-pause-btn" id="hud-pause-btn" aria-label="Pause">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <rect x="6" y="4" width="4" height="16"/>
+                <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+        </button>
+    </div>
+    <div id="screen-pause" class="screen overlay-screen">
+        <div class="pause-content">
+            <h2>Pause</h2>
+            <button class="btn btn-primary" id="btn-resume">Reprendre</button>
+            <button class="btn btn-secondary" id="btn-pause-menu">Menu</button>
+        </div>
+    </div>
+    <div id="screen-gameover" class="screen">
+        <div class="gameover-content">
+            <div class="gameover-title-block">
+                <h2>Fin du vol</h2>
+                <p class="gameover-sub" id="gameover-cause">Collision</p>
+            </div>
+            <div class="gameover-stats">
+                <div class="gameover-stat">
+                    <span class="gameover-label">Distance</span>
+                    <span class="gameover-value accent" id="gameover-distance">0 m</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">Pilote</span>
+                    <span class="gameover-value" id="gameover-pilot">---</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">Rang</span>
+                    <span class="gameover-value" id="gameover-rank">#-</span>
+                </div>
+                <div class="gameover-stat">
+                    <span class="gameover-label">SpineCoins gagnes</span>
+                    <span class="gameover-value gold" id="gameover-coins">+0</span>
+                </div>
+                <div class="gameover-stat" id="gameover-quest-block" style="display:none">
+                    <span class="gameover-label">Quete completee !</span>
+                    <span class="gameover-value accent" id="gameover-quest-name"></span>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-retry">Rejouer</button>
+            <button class="btn btn-secondary" id="btn-back-menu">Menu</button>
+        </div>
+    </div>
+    <div id="screen-banned" class="screen overlay-screen">
+        <div class="banned-content">
+            <div class="banned-icon-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <h2 class="banned-title">HACKER DETECTE</h2>
+            <p class="banned-pilot" id="banned-pilot-name">Samuel</p>
+            <p class="banned-desc">a ete banni pour 2 minutes.</p>
+            <div class="banned-timer-block">
+                <span class="banned-timer-label">Temps restant</span>
+                <span class="banned-timer" id="banned-timer">2:00</span>
+            </div>
+            <div class="banned-separator">ou changer de pilote pour continuer</div>
+            <div class="banned-name-change">
+                <input type="text" id="banned-new-name" class="input-field" maxlength="15" placeholder="Nouveau nom de pilote" autocomplete="off">
+                <button class="btn btn-primary" id="btn-banned-play">Jouer sous ce nom</button>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="js/app.js"><\/script>
+</body>
+</html>`,
+
+  'manifest.json': `{
+  "name": "SkySpine",
+  "short_name": "SkySpine",
+  "description": "Jeu d'avion 2D - Evite les oiseaux et les eclairs",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0e1a",
+  "theme_color": "#1a2a4a",
+  "icons": [
+    {
+      "src": "/assets/skypine.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}`,
+
+  'sw.js': `const CACHE_NAME = 'skyspine-v3';
+const ASSETS_TO_CACHE = [
+    '/','index.html','manifest.json',
+    'css/base.css','css/components.css','css/screens.css','css/game.css',
+    'js/app.js','js/db.js','js/assets.js','js/controls.js','js/weather.js',
+    'js/obstacles.js','js/collision.js','js/renderer.js','js/game.js',
+    'js/firebase.js','js/planes.js','js/quests.js','js/sound.js',
+    'assets/biplane.png','assets/avion_bleu.png','assets/explosion_2d.png','assets/skypine.png',
+    'assets/backgrounds/background_plage.png','assets/backgrounds/village.png',
+    'assets/ennemis/avion_rouge.png','assets/ennemis/nuage_eclair.png',
+    'assets/ennemis/oiseau_1_gauche.png','assets/ennemis/oiseau_2_gauche.png',
+    'assets/svg/chevron-left.svg','assets/svg/download-cloud.svg',
+    'assets/svg/gear-solid-full.svg','assets/svg/house-regular-full.svg'
+];
+self.addEventListener('install',(e)=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS_TO_CACHE)));self.skipWaiting();});
+self.addEventListener('activate',(e)=>{e.waitUntil(caches.keys().then(ns=>Promise.all(ns.filter(n=>n!==CACHE_NAME).map(n=>caches.delete(n)))));self.clients.claim();});
+self.addEventListener('fetch',(e)=>{if(e.request.url.includes('firestore.googleapis.com')||e.request.url.includes('firebase'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(nr=>{if(nr&&nr.status===200&&nr.type==='basic'){const c=nr.clone();caches.open(CACHE_NAME).then(ca=>ca.put(e.request,c));}return nr;})));});`,
+
+  'css/base.css': `*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+    --bg-dark:#07090f;--bg-panel:#0d1117;--bg-card:#131922;--bg-card-hover:#1a2230;
+    --border:#1e2a3a;--border-light:#263040;
+    --accent:#38bdf8;--accent-dim:rgba(56,189,248,0.12);--accent-glow:rgba(56,189,248,0.28);--accent-hover:#7dd3fc;
+    --gold:#f59e0b;--gold-dim:rgba(245,158,11,0.15);--silver:#94a3b8;--bronze:#b45309;
+    --success:#22c55e;--success-dim:rgba(34,197,94,0.15);
+    --danger:#ef4444;--danger-dim:rgba(239,68,68,0.10);--danger-hover:#f87171;
+    --text-primary:#eef2f7;--text-secondary:#7a8fa8;--text-muted:#3d4e62;
+    --radius:14px;--radius-sm:9px;--radius-xs:6px;
+    --transition:0.22s ease;--transition-slow:0.42s ease;
+    --font:-apple-system,BlinkMacSystemFont,'Segoe UI','SF Pro Display',system-ui,sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-dark);color:var(--text-primary);font-family:var(--font);-webkit-font-smoothing:antialiased;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}`,
+
+  'css/components.css': `/* Boutons */
+.btn{width:100%;padding:14px 24px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;transition:all var(--transition);letter-spacing:0.2px;font-family:var(--font);}
+.btn-primary{background:linear-gradient(135deg,var(--accent) 0%,#0ea5e9 100%);color:#04080f;box-shadow:0 4px 20px var(--accent-glow),inset 0 1px 0 rgba(255,255,255,0.15);}
+.btn-primary:hover{box-shadow:0 6px 28px var(--accent-glow);transform:translateY(-1px);}
+.btn-primary:active{transform:scale(0.97) translateY(0);box-shadow:0 2px 10px var(--accent-glow);}
+.btn-secondary{background:var(--bg-card);color:var(--text-primary);border:1px solid var(--border-light);}
+.btn-secondary:hover{background:var(--bg-card-hover);}
+.btn-secondary:active{transform:scale(0.97);}
+.btn-danger{background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.3);}
+.btn-danger:hover{background:rgba(239,68,68,0.18);}
+.btn-gold{background:linear-gradient(135deg,var(--gold) 0%,#d97706 100%);color:#04080f;box-shadow:0 4px 20px var(--gold-dim);}
+.btn-gold:active{transform:scale(0.97);}
+.btn-icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--bg-card);border:1px solid var(--border-light);border-radius:50%;cursor:pointer;transition:all var(--transition);color:var(--text-secondary);}
+.btn-icon:hover{background:var(--bg-card-hover);color:var(--text-primary);}
+.btn-icon:active{transform:scale(0.88);}
+.btn-icon .icon{width:20px;height:20px;filter:invert(0.7);}
+.btn-icon .icon-svg,.icon-svg{width:20px;height:20px;stroke:currentColor;fill:none;}
+/* Input */
+.input-field{width:100%;padding:13px 16px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-sm);color:var(--text-primary);font-size:15px;outline:none;transition:border-color var(--transition),box-shadow var(--transition);font-family:var(--font);}
+.input-field:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+.input-field::placeholder{color:var(--text-muted);}
+.label{font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.7px;}
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text-primary);}
+.toggle-switch{position:relative;width:44px;height:26px;cursor:pointer;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:var(--border-light);border-radius:13px;transition:background var(--transition);}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform var(--transition);box-shadow:0 1px 4px rgba(0,0,0,0.4);}
+.toggle-switch input:checked+.toggle-slider{background:var(--accent);}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(18px);}
+/* Coin */
+.coin-icon-small{width:16px;height:16px;background:radial-gradient(circle at 40% 35%,var(--gold),#b45309);border-radius:50%;flex-shrink:0;box-shadow:0 0 6px rgba(245,158,11,0.5);}
+/* Leaderboard */
+.lb-entry{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg-card);border-radius:var(--radius-sm);border:1px solid var(--border);transition:background var(--transition);}
+.lb-entry.lb-mine{border-color:var(--accent);background:var(--accent-dim);}
+.lb-rank{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:13px;font-weight:700;background:var(--border-light);color:var(--text-secondary);flex-shrink:0;}
+.lb-entry.rank-1 .lb-rank{background:linear-gradient(135deg,#f59e0b,#d97706);color:#04080f;}
+.lb-entry.rank-2 .lb-rank{background:linear-gradient(135deg,#94a3b8,#64748b);color:#04080f;}
+.lb-entry.rank-3 .lb-rank{background:linear-gradient(135deg,#b45309,#7c2d12);color:#fff;}
+.lb-name{flex:1;font-size:14px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-score{font-size:14px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+/* Garage */
+.garage-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 12px;background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all var(--transition);position:relative;}
+.garage-card.active-plane{border-color:var(--accent);background:var(--accent-dim);box-shadow:0 0 0 3px var(--accent-glow);}
+.garage-card.locked{opacity:0.6;cursor:default;}
+.garage-card img{width:70px;height:auto;}
+.garage-card-name{font-size:13px;font-weight:600;color:var(--text-primary);}
+.garage-card-status{font-size:11px;color:var(--text-muted);}
+.garage-card.active-plane .garage-card-status{color:var(--accent);}
+.garage-lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius);background:rgba(7,9,15,0.7);}
+.garage-unlock-label{font-size:10px;color:var(--text-muted);text-align:center;padding:0 4px;line-height:1.4;}
+.garage-select-btn{font-size:12px;padding:6px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600;transition:all var(--transition);}
+/* Quests */
+.quest-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:10px;}
+.quest-card.completed{border-color:var(--success);background:var(--success-dim);}
+.quest-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.quest-title{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.4;}
+.quest-reward{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:13px;font-weight:700;color:var(--gold);}
+.quest-progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.quest-progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 0.4s ease;}
+.quest-card.completed .quest-progress-fill{background:var(--success);}
+.quest-progress-label{font-size:11px;color:var(--text-muted);}
+/* Active plane card */
+.active-plane-card{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);}
+.active-plane-card img{width:60px;height:auto;}
+.active-plane-name{font-size:15px;font-weight:700;color:var(--text-primary);display:block;}
+.active-plane-sub{font-size:12px;color:var(--text-muted);display:block;margin-top:3px;}
+/* Tabs */
+.lb-tabs{display:flex;gap:4px;background:var(--bg-card);border-radius:var(--radius-sm);padding:4px;}
+.lb-tab{flex:1;padding:8px;background:transparent;border:none;border-radius:6px;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font);}
+.lb-tab.active{background:var(--bg-panel);color:var(--text-primary);box-shadow:0 1px 4px rgba(0,0,0,0.3);}`,
+
+  'css/screens.css': `/* Screens */
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity var(--transition-slow),visibility var(--transition-slow);z-index:1;}
+.screen.active{opacity:1;visibility:visible;z-index:10;}
+.overlay-screen{z-index:50;}
+.overlay-screen.active{z-index:60;}
+/* Loading */
+#screen-loading{background:var(--bg-dark);z-index:100;flex-direction:column;}
+.loading-content{display:flex;flex-direction:column;align-items:center;gap:0;padding:40px 32px;text-align:center;}
+.loading-logo-block{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:32px;}
+.loading-logo{width:100px;height:auto;animation:logoPulse 2s ease-in-out infinite;filter:drop-shadow(0 0 28px var(--accent-glow));}
+@keyframes logoPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px var(--accent-glow));}50%{transform:scale(1.06);filter:drop-shadow(0 0 40px rgba(56,189,248,0.5));}}
+.loading-game-title{font-size:42px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%,#7dd3fc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.loading-credits-block{display:flex;flex-direction:column;gap:4px;margin-bottom:40px;padding:16px 24px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);}
+.loading-credits-line{font-size:14px;color:var(--text-secondary);line-height:1.6;}
+.credits-name{color:var(--accent);font-weight:700;letter-spacing:0.2px;}
+.loading-bar-container{width:260px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.loading-bar{width:0%;height:100%;background:linear-gradient(90deg,var(--accent),#7dd3fc);border-radius:2px;transition:width 0.15s ease;box-shadow:0 0 10px var(--accent-glow);}
+.loading-percent{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+/* Menu */
+#screen-menu{background:var(--bg-dark);overflow:hidden;}
+.menu-bg-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0.25;}
+.menu-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;padding:32px 24px;width:100%;max-width:340px;}
+.menu-header{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:10px;}
+.menu-logo{width:72px;height:auto;filter:drop-shadow(0 0 20px var(--accent-glow));margin-bottom:4px;}
+.menu-title{font-size:38px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff 0%,var(--accent) 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.menu-tagline{font-size:13px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
+.menu-pilot{width:100%;display:flex;flex-direction:column;gap:6px;}
+.menu-bottom-bar{display:flex;gap:12px;margin-top:4px;}
+.menu-coins-bar{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-muted);margin-top:2px;}
+.menu-coins-bar span{font-variant-numeric:tabular-nums;}
+.coins-label{color:var(--text-muted);}
+#menu-coins-display{color:var(--gold);font-weight:700;}
+/* Settings */
+#screen-settings{background:var(--bg-dark);align-items:flex-start;}
+.settings-content{width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:24px;height:100%;overflow-y:auto;padding-top:max(env(safe-area-inset-top),24px);padding-bottom:max(env(safe-area-inset-bottom),24px);}
+.settings-header,.leaderboard-header,.garage-header,.quests-header{display:flex;align-items:center;gap:14px;}
+.settings-header h2,.leaderboard-header h2,.garage-header h2,.quests-header h2{font-size:20px;font-weight:700;flex:1;}
+.settings-section{display:flex;flex-direction:column;gap:10px;}
+.settings-section h3{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;font-weight:600;}
+.settings-credits{margin-top:auto;padding-top:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--text-muted);}
+.settings-credits strong{color:var(--text-secondary);}
+.version-label{margin-top:6px;font-size:11px;color:var(--text-muted);opacity:0.6;}
+/* Garage */
+#screen-garage{background:var(--bg-dark);align-items:flex-start;}
+.garage-content{width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:20px;height:100%;padding-top:max(env(safe-area-inset-top),24px);padding-bottom:max(env(safe-area-inset-bottom),24px);overflow-y:auto;}
+.garage-coins{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;color:var(--gold);}
+.garage-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+/* Quests */
+#screen-quests{background:var(--bg-dark);align-items:flex-start;}
+.quests-content{width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:16px;height:100%;padding-top:max(env(safe-area-inset-top),24px);padding-bottom:max(env(safe-area-inset-bottom),24px);overflow-y:auto;}
+.quests-list{display:flex;flex-direction:column;gap:10px;}
+/* Leaderboard */
+#screen-leaderboard{background:var(--bg-dark);align-items:flex-start;}
+.leaderboard-content{width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:16px;height:100%;padding-top:max(env(safe-area-inset-top),24px);padding-bottom:max(env(safe-area-inset-bottom),24px);}
+.leaderboard-list{display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1;padding-bottom:24px;}
+.leaderboard-empty{text-align:center;color:var(--text-muted);font-size:14px;padding:40px 0;}
+/* Game over */
+#screen-gameover{background:rgba(7,9,15,0.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
+.gameover-content{display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px 24px;width:100%;max-width:340px;}
+.gameover-title-block{text-align:center;margin-bottom:4px;}
+.gameover-title-block h2{font-size:30px;font-weight:800;background:linear-gradient(135deg,#fff 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px;}
+.gameover-sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
+.gameover-stats{width:100%;display:flex;flex-direction:column;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);overflow:hidden;}
+.gameover-stat{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);}
+.gameover-stat:last-child{border-bottom:none;}
+.gameover-label{font-size:13px;color:var(--text-muted);}
+.gameover-value{font-size:15px;font-weight:700;color:var(--text-primary);font-variant-numeric:tabular-nums;}
+.gameover-value.accent{color:var(--accent);}
+.gameover-value.gold{color:var(--gold);}
+/* Pause */
+#screen-pause{background:rgba(7,9,15,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.pause-content{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px 32px;width:100%;max-width:280px;}
+.pause-content h2{font-size:28px;font-weight:800;letter-spacing:-0.5px;color:var(--text-primary);margin-bottom:8px;}
+/* Banned */
+#screen-banned{background:rgba(7,9,15,0.96);}
+.banned-content{display:flex;flex-direction:column;align-items:center;gap:14px;padding:36px 28px;width:100%;max-width:340px;text-align:center;}
+.banned-icon-block{color:var(--danger);margin-bottom:4px;}
+.banned-title{font-size:22px;font-weight:800;color:var(--danger);letter-spacing:2px;}
+.banned-pilot{font-size:18px;font-weight:700;color:var(--text-primary);}
+.banned-desc{font-size:14px;color:var(--text-secondary);}
+.banned-timer-block{display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 24px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);margin:4px 0;}
+.banned-timer-label{font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-muted);font-weight:600;}
+.banned-timer{font-size:36px;font-weight:800;color:var(--danger);font-variant-numeric:tabular-nums;}
+.banned-separator{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;border-top:1px solid var(--border);width:100%;padding-top:14px;}
+.banned-name-change{width:100%;display:flex;flex-direction:column;gap:10px;}
+/* Animations */
+@keyframes slideUp{from{transform:translateY(24px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.screen.active .menu-content,.screen.active .gameover-content,.screen.active .pause-content,.screen.active .banned-content{animation:slideUp 0.35s cubic-bezier(0.22,0.61,0.36,1);}`,
+
+  'css/game.css': `#screen-game{background:#000;}
+#game-canvas{width:100%;height:100%;display:block;}
+.game-hud{position:fixed;top:max(env(safe-area-inset-top),0px);left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:14px 18px;pointer-events:none;z-index:20;}
+.hud-left{display:flex;flex-direction:column;gap:3px;}
+.hud-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.hud-score{font-size:24px;font-weight:800;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.8);font-variant-numeric:tabular-nums;letter-spacing:-0.5px;}
+.hud-coins-earned{font-size:12px;font-weight:600;color:#f59e0b;text-shadow:0 1px 6px rgba(0,0,0,0.7);}
+.hud-weather{font-size:12px;font-weight:600;color:#fff;background:rgba(0,0,0,0.5);padding:4px 12px;border-radius:20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08);}
+.hud-wind{font-size:11px;color:rgba(255,255,255,0.7);min-height:16px;}
+.game-pause-hint{position:fixed;bottom:28%;left:50%;transform:translateX(-50%);font-size:17px;font-weight:600;color:rgba(255,255,255,0.85);text-shadow:0 2px 10px rgba(0,0,0,0.7);pointer-events:none;z-index:20;animation:hintPulse 1.4s ease-in-out infinite;white-space:nowrap;}
+.game-pause-hint.hidden{display:none;}
+@keyframes hintPulse{0%,100%{opacity:0.55;transform:translateX(-50%) scale(1);}50%{opacity:1;transform:translateX(-50%) scale(1.02);}}
+.hud-pause-btn{position:fixed;bottom:max(env(safe-area-inset-bottom),16px);right:16px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);border-radius:50%;cursor:pointer;pointer-events:auto;z-index:20;color:rgba(255,255,255,0.7);transition:all 0.18s ease;backdrop-filter:blur(4px);}
+.hud-pause-btn:active{transform:scale(0.88);background:rgba(0,0,0,0.7);}`,
+
+  'js/firebase.js': `const FIREBASE_CONFIG={apiKey:"AIzaSyAr0C5DTL1zzdilQXScj9mmynX995MPeCs",authDomain:"skyspine-146ae.firebaseapp.com",projectId:"skyspine-146ae",storageBucket:"skyspine-146ae.firebasestorage.app",messagingSenderId:"888566895773",appId:"1:888566895773:web:d72a5d955cf2f55c8a3074",measurementId:"G-XTQWRHBEK3"};
+const FIRESTORE_BASE=\`https://firestore.googleapis.com/v1/projects/\${FIREBASE_CONFIG.projectId}/databases/(default)/documents\`;
+function firestoreValue(val){if(typeof val==='string')return{stringValue:val};if(typeof val==='number')return{integerValue:String(Math.floor(val))};if(typeof val==='boolean')return{booleanValue:val};return{nullValue:null};}
+function parseFirestoreDoc(doc){if(!doc||!doc.fields)return null;const out={};for(const[key,val]of Object.entries(doc.fields)){if('stringValue'in val)out[key]=val.stringValue;else if('integerValue'in val)out[key]=parseInt(val.integerValue,10);else if('doubleValue'in val)out[key]=val.doubleValue;else if('booleanValue'in val)out[key]=val.booleanValue;else out[key]=null;}if(doc.name)out._id=doc.name.split('/').pop();return out;}
+async function firestoreQuery(collection,orderField,limit=20){const body={structuredQuery:{from:[{collectionId:collection}],orderBy:[{field:{fieldPath:orderField},direction:'DESCENDING'}],limit:limit}};const url=\`\${FIRESTORE_BASE}:runQuery?key=\${FIREBASE_CONFIG.apiKey}\`;const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!res.ok)throw new Error('Firestore query failed');const data=await res.json();return data.filter(d=>d.document).map(d=>parseFirestoreDoc(d.document));}
+async function firestoreAddDoc(collection,fields){const ff={};for(const[k,v]of Object.entries(fields))ff[k]=firestoreValue(v);const url=\`\${FIRESTORE_BASE}/\${collection}?key=\${FIREBASE_CONFIG.apiKey}\`;const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:ff})});if(!res.ok)throw new Error('Firestore add failed');return res.json();}
+async function firestoreSetDoc(collection,docId,fields){const ff={};for(const[k,v]of Object.entries(fields))ff[k]=firestoreValue(v);const url=\`\${FIRESTORE_BASE}/\${collection}/\${docId}?key=\${FIREBASE_CONFIG.apiKey}\`;const res=await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:ff})});if(!res.ok)throw new Error('Firestore set failed');return res.json();}
+export async function saveGlobalScore(name,distance){try{await firestoreAddDoc('scores',{name,distance,timestamp:Date.now()});}catch(e){console.warn('Score non sauvegarde:',e);}}
+export async function getGlobalTopScores(limit=20){try{return await firestoreQuery('scores','distance',limit);}catch(e){return[];}}
+export async function saveGlobalBestPath(name,distance,path){try{const existing=await firestoreQuery('ghost','distance',1);if(existing.length===0||distance>existing[0].distance){const pathStr=JSON.stringify(path.slice(0,2000));await firestoreAddDoc('ghost',{name,distance,path:pathStr,timestamp:Date.now()});}}catch(e){}}
+export async function getGlobalBestPath(){try{const docs=await firestoreQuery('ghost','distance',1);if(docs.length===0)return null;const doc=docs[0];return{name:doc.name,distance:doc.distance,path:JSON.parse(doc.path||'[]')};}catch(e){return null;}}
+export async function saveQuestProgress(pilotId,questId,progress,completed){try{await firestoreSetDoc('quests',\`\${pilotId}_\${questId}\`,{pilotId,questId,progress,completed});}catch(e){}}
+export async function getQuestProgress(pilotId){try{const body={structuredQuery:{from:[{collectionId:'quests'}],where:{fieldFilter:{field:{fieldPath:'pilotId'},op:'EQUAL',value:{stringValue:pilotId}}}}};const url=\`\${FIRESTORE_BASE}:runQuery?key=\${FIREBASE_CONFIG.apiKey}\`;const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!res.ok)return{};const data=await res.json();const result={};data.filter(d=>d.document).forEach(d=>{const doc=parseFirestoreDoc(d.document);result[doc.questId]={progress:doc.progress,completed:doc.completed};});return result;}catch(e){return{};}}`,
+
+  'js/planes.js': `export const PLANES=[{id:'biplane',name:'Spine-01',asset:'biplane',img:'assets/biplane.png',description:"L'avion de depart. Equilibre et fiable.",unlocked:true,price:0,unlockCondition:null,ability:'Equilibre',scoreMultiplier:1.0},{id:'avion_bleu',name:'Blue Falcon',asset:'avion_bleu',img:'assets/avion_bleu.png',description:'Rapide et maniable. Score x1.2.',unlocked:false,price:800,unlockCondition:{type:'coins',amount:800},ability:'Rapidite',scoreMultiplier:1.2},{id:'shadow_x',name:'Shadow-X',asset:'biplane',img:'assets/biplane.png',description:'Debloquez en etant banni une fois (easter egg). Invisible aux radars.',unlocked:false,price:0,unlockCondition:{type:'banned_once'},ability:'Furtif',scoreMultiplier:1.1},{id:'gold_wing',name:'Gold Wing',asset:'avion_bleu',img:'assets/avion_bleu.png',description:'Le prestige. 5000 SpineCoins. Double les points.',unlocked:false,price:5000,unlockCondition:{type:'coins',amount:5000},ability:'Double coins',scoreMultiplier:2.0},{id:'the_glitch',name:'The Glitch',asset:'biplane',img:'assets/biplane.png',description:"L'avion ultime. Completez toutes les quetes de maitrise.",unlocked:false,price:0,unlockCondition:{type:'all_quests'},ability:'Traverser 1 obstacle/partie',scoreMultiplier:1.5}];
+export function getPlane(id){return PLANES.find(p=>p.id===id)||PLANES[0];}`,
+
+  'js/quests.js': `export const QUESTS=[{id:'q_score_500',title:'Premier vol',desc:'Atteindre 500 metres',type:'score_milestone',target:500,reward:150,unlocksPlane:null},{id:'q_score_2000',title:'Grand voyageur',desc:'Atteindre 2000 metres',type:'score_milestone',target:2000,reward:300,unlocksPlane:null},{id:'q_score_5000',title:"L'Incorruptible",desc:'Atteindre 5000 metres sans toucher le plafond',type:'score_no_ceiling',target:5000,reward:750,unlocksPlane:'the_glitch'},{id:'q_survive_5min',title:'Le Survivant',desc:'Faire une partie de plus de 5 minutes',type:'survive_time',target:300,reward:500,unlocksPlane:'the_glitch'},{id:'q_obstacles_50',title:'Le Fantome',desc:'Passer a travers 50 obstacles sans mourir (cumul)',type:'obstacles_passed',target:50,reward:400,unlocksPlane:'the_glitch'},{id:'q_coins_5000',title:"L'Investisseur",desc:'Accumuler 5000 SpineCoins au total',type:'total_coins',target:5000,reward:0,unlocksPlane:'the_glitch'},{id:'q_storm_survive',title:"Chasseur d'orages",desc:"Survivre 60 secondes en phase d'orage",type:'storm_survive',target:60,reward:350,unlocksPlane:null}];
+export function getQuest(id){return QUESTS.find(q=>q.id===id);}
+export function areAllGlitchQuestsDone(completedIds){const gq=QUESTS.filter(q=>q.unlocksPlane==='the_glitch');return gq.every(q=>completedIds.includes(q.id));}`,
+
+  'js/sound.js': `let ctx=null;let soundEnabled=true;
+function getCtx(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();return ctx;}
+export function setSoundEnabled(val){soundEnabled=val;}
+function playTone(o){if(!soundEnabled)return;try{const ac=getCtx();const osc=ac.createOscillator();const gain=ac.createGain();osc.connect(gain);gain.connect(ac.destination);osc.type=o.type||'sine';osc.frequency.setValueAtTime(o.freq||440,ac.currentTime);if(o.freqEnd)osc.frequency.linearRampToValueAtTime(o.freqEnd,ac.currentTime+(o.duration||0.1));gain.gain.setValueAtTime(o.volume||0.3,ac.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+(o.duration||0.1));osc.start(ac.currentTime);osc.stop(ac.currentTime+(o.duration||0.1)+0.02);}catch(e){}}
+function playNoise(o){if(!soundEnabled)return;try{const ac=getCtx();const bs=ac.sampleRate*(o.duration||0.1);const buf=ac.createBuffer(1,bs,ac.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<bs;i++)d[i]=Math.random()*2-1;const src=ac.createBufferSource();src.buffer=buf;const gain=ac.createGain();const filter=ac.createBiquadFilter();filter.type=o.filterType||'bandpass';filter.frequency.value=o.filterFreq||200;filter.Q.value=o.filterQ||1;src.connect(filter);filter.connect(gain);gain.connect(ac.destination);gain.gain.setValueAtTime(o.volume||0.2,ac.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+(o.duration||0.1));src.start();}catch(e){}}
+export function playThrust(){playNoise({duration:0.06,filterType:'bandpass',filterFreq:600,filterQ:0.5,volume:0.07});}
+export function playExplosion(){playNoise({duration:0.5,filterType:'lowpass',filterFreq:150,filterQ:0.8,volume:0.5});playTone({type:'sawtooth',freq:80,freqEnd:20,duration:0.4,volume:0.3});}
+export function playLightningStrike(){playNoise({duration:0.2,filterType:'highpass',filterFreq:2000,volume:0.4});playTone({type:'square',freq:220,freqEnd:40,duration:0.15,volume:0.2});}
+export function playBirdHit(){playTone({type:'sine',freq:300,freqEnd:100,duration:0.12,volume:0.25});}
+export function playMissile(){playTone({type:'sawtooth',freq:500,freqEnd:200,duration:0.3,volume:0.35});playNoise({duration:0.3,filterFreq:400,volume:0.15});}
+export function playCoinEarned(){playTone({type:'sine',freq:880,duration:0.06,volume:0.2});setTimeout(()=>playTone({type:'sine',freq:1100,duration:0.06,volume:0.2}),60);}
+export function playQuestComplete(){[523,659,784,1047].forEach((freq,i)=>setTimeout(()=>playTone({type:'sine',freq,duration:0.12,volume:0.25}),i*100));}
+export function playUnlock(){[440,554,659,880].forEach((freq,i)=>setTimeout(()=>playTone({type:'triangle',freq,duration:0.15,volume:0.22}),i*80));}
+export function playBanned(){playTone({type:'sawtooth',freq:200,freqEnd:80,duration:0.6,volume:0.4});playNoise({duration:0.3,filterFreq:300,volume:0.3});}`,
+
+  'js/weather.js': `const CLEAR_DURATION=120;const CLOUDY_DURATION=120;
+export function getWeatherPhase(f){const s=f/60;if(s<CLEAR_DURATION)return'clear';if(s<CLEAR_DURATION+CLOUDY_DURATION)return'cloudy';return'storm';}
+export function getWeatherLabel(p){return{clear:'Clair',cloudy:'Nuageux',storm:'Orage'}[p]||'Clair';}
+const WIND_EVENTS=[{duration:300,strength:0.15,label:'Vent de face'},{duration:240,strength:-0.12,label:'Vent arriere'},{duration:0,strength:0,label:''}];
+let currentWind={strength:0,label:'',timer:0,nextAt:600};
+export function updateWind(f){if(f<currentWind.nextAt){if(currentWind.timer>0){currentWind.timer--;if(currentWind.timer===0){currentWind.strength=0;currentWind.label='';currentWind.nextAt=f+180+Math.random()*300;}}return;}const e=WIND_EVENTS[Math.floor(Math.random()*(WIND_EVENTS.length-1))];currentWind.strength=e.strength;currentWind.label=e.label;currentWind.timer=e.duration;currentWind.nextAt=f+e.duration+240+Math.random()*300;}
+export function getWindStrength(){return currentWind.strength;}
+export function getWindLabel(){return currentWind.label;}
+export function resetWind(){currentWind={strength:0,label:'',timer:0,nextAt:600};}`,
+
+  'js/controls.js': `let pressingState=false;let onFirstPress=null;
+export function isPressing(){return pressingState;}
+export function setFirstPressCallback(cb){onFirstPress=cb;}
+function handlePressStart(e){if(e)e.preventDefault();if(onFirstPress){onFirstPress();onFirstPress=null;}pressingState=true;}
+function handlePressEnd(e){if(e)e.preventDefault();pressingState=false;}
+export function setupControls(canvasEl){document.addEventListener('keydown',(e)=>{if(e.code==='Space'){e.preventDefault();handlePressStart();}});document.addEventListener('keyup',(e)=>{if(e.code==='Space')handlePressEnd();});canvasEl.addEventListener('touchstart',handlePressStart,{passive:false});canvasEl.addEventListener('touchend',handlePressEnd,{passive:false});canvasEl.addEventListener('touchcancel',handlePressEnd,{passive:false});canvasEl.addEventListener('mousedown',handlePressStart);canvasEl.addEventListener('mouseup',handlePressEnd);}
+export function resetControls(){pressingState=false;}`,
+
+  'js/collision.js': `const SHRINK=0.2;
+export function rectsCollide(ax,ay,aw,ah,bx,by,bw,bh){const asx=ax+aw*SHRINK,asy=ay+ah*SHRINK,asw=aw*(1-2*SHRINK),ash=ah*(1-2*SHRINK);const bsx=bx+bw*SHRINK,bsy=by+bh*SHRINK,bsw=bw*(1-2*SHRINK),bsh=bh*(1-2*SHRINK);return asx<bsx+bsw&&asx+asw>bsx&&asy<bsy+bsh&&asy+ash>bsy;}
+export function checkGroundCollision(planeY,planeHeight,groundY){return(planeY+planeHeight)>=groundY;}
+export function checkLightningHit(lightnings,px,py,pw,ph){for(const l of lightnings){if(l.alpha<=0.3)continue;for(const seg of l.segments){if(lineIntersectsRect(seg.x1,seg.y1,seg.x2,seg.y2,px,py,pw,ph))return true;}}return false;}
+function lineIntersectsRect(x1,y1,x2,y2,rx,ry,rw,rh){const s=0.25;rx+=rw*s;ry+=rh*s;rw*=(1-2*s);rh*=(1-2*s);return linesIntersect(x1,y1,x2,y2,rx,ry,rx+rw,ry)||linesIntersect(x1,y1,x2,y2,rx+rw,ry,rx+rw,ry+rh)||linesIntersect(x1,y1,x2,y2,rx,ry+rh,rx+rw,ry+rh)||linesIntersect(x1,y1,x2,y2,rx,ry,rx,ry+rh);}
+function linesIntersect(x1,y1,x2,y2,x3,y3,x4,y4){const denom=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);if(Math.abs(denom)<0.001)return false;const t=((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4))/denom;const u=-((x1-x2)*(y1-y3)-(y1-y2)*(x1-x3))/denom;return t>=0&&t<=1&&u>=0&&u<=1;}`,
+
+  'js/obstacles.js': `export function spawnObstacle(weather,canvasW,canvasH,groundY,scrollSpeed){const obs=[];if(weather==='clear'){const bt=Math.random()>0.5?'oiseau_1':'oiseau_2';obs.push({type:'bird',asset:bt,x:canvasW+50,y:40+Math.random()*(groundY-100),width:55,height:45,speed:scrollSpeed+0.5+Math.random()*1.5,diving:false,divingSpeed:0});}else if(weather==='cloudy'){const roll=Math.random();if(roll<0.4){obs.push({type:'plane',asset:'ennemi_avion',x:canvasW+50,y:30+Math.random()*(groundY-120),width:70,height:50,speed:scrollSpeed+1.5+Math.random()});}else if(roll<0.7){const baseY=60+Math.random()*(groundY-220);const count=2+Math.floor(Math.random()*2);for(let i=0;i<count;i++){const bt=Math.random()>0.5?'oiseau_1':'oiseau_2';obs.push({type:'bird',asset:bt,x:canvasW+50+i*50,y:baseY+i*35,width:50,height:40,speed:scrollSpeed+0.8+Math.random(),diving:false,divingSpeed:0});}}else{const bt=Math.random()>0.5?'oiseau_1':'oiseau_2';obs.push({type:'bird',asset:bt,x:canvasW+50,y:30+Math.random()*(groundY*0.3),width:55,height:45,speed:scrollSpeed+1,diving:true,divingSpeed:1+Math.random()*1.5});}}else{const roll=Math.random();if(roll<0.5){obs.push({type:'cloud',asset:'ennemi_nuage',x:canvasW+80,y:20+Math.random()*(groundY*0.4),width:75,height:60,speed:scrollSpeed+0.5});}else{const bt=Math.random()>0.5?'oiseau_1':'oiseau_2';obs.push({type:'bird',asset:bt,x:canvasW+50,y:40+Math.random()*(groundY-120),width:55,height:45,speed:scrollSpeed+2+Math.random()*2,diving:Math.random()>0.6,divingSpeed:1.5+Math.random()*2});}}return obs;}
+export function spawnLightning(canvasW,canvasH){const startX=canvasW*0.3+Math.random()*canvasW*0.6;const diagonal=Math.random()>0.4;const segments=[];let x=startX,y=0;const segCount=5+Math.floor(Math.random()*4);for(let i=0;i<segCount;i++){const nx=diagonal?x+(Math.random()-0.3)*60:x+(Math.random()-0.5)*40;const ny=y+(canvasH/segCount)+Math.random()*20;segments.push({x1:x,y1:y,x2:nx,y2:ny});x=nx;y=ny;}return{segments,alpha:1,decay:0.02+Math.random()*0.02};}`,
+
+  'js/assets.js': `const ASSET_LIST={biplane:'assets/biplane.png',avion_bleu:'assets/avion_bleu.png',explosion:'assets/explosion_2d.png',bg_plage:'assets/backgrounds/background_plage.png',bg_village:'assets/backgrounds/village.png',ennemi_avion:'assets/ennemis/avion_rouge.png',ennemi_nuage:'assets/ennemis/nuage_eclair.png',oiseau_1:'assets/ennemis/oiseau_1_gauche.png',oiseau_2:'assets/ennemis/oiseau_2_gauche.png'};
+export const assets={};
+function loadImage(src){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Impossible de charger: '+src));img.src=src;});}
+export async function loadAllAssets(){const keys=Object.keys(ASSET_LIST);const total=keys.length;let loaded=0;const barEl=document.getElementById('loading-bar');const percentEl=document.getElementById('loading-percent');for(const key of keys){assets[key]=await loadImage(ASSET_LIST[key]);loaded++;const pct=Math.round((loaded/total)*100);if(barEl)barEl.style.width=pct+'%';if(percentEl)percentEl.textContent=pct+'%';}}`,
+
+  'js/db.js': `const DB_NAME='SkySpineDB';const DB_VERSION=2;const STORE_SCORES='scores';const STORE_SETTINGS='settings';const STORE_QUEST_PROGRESS='quest_progress';
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=(e)=>{const db=e.target.result;if(!db.objectStoreNames.contains(STORE_SCORES)){const s=db.createObjectStore(STORE_SCORES,{keyPath:'id',autoIncrement:true});s.createIndex('distance','distance',{unique:false});}if(!db.objectStoreNames.contains(STORE_SETTINGS))db.createObjectStore(STORE_SETTINGS,{keyPath:'key'});if(!db.objectStoreNames.contains(STORE_QUEST_PROGRESS))db.createObjectStore(STORE_QUEST_PROGRESS,{keyPath:'questId'});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+export async function saveScore(name,distance){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_SCORES,'readwrite');tx.objectStore(STORE_SCORES).add({name,distance:Math.floor(distance),date:Date.now()});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export async function getTopScores(limit=10){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_SCORES,'readonly');const req=tx.objectStore(STORE_SCORES).getAll();req.onsuccess=()=>resolve(req.result.sort((a,b)=>b.distance-a.distance).slice(0,limit));req.onerror=()=>reject(req.error);});}
+export async function getRank(distance){const scores=await getTopScores(100);return scores.filter(s=>s.distance>distance).length+1;}
+export async function clearAllScores(){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_SCORES,'readwrite');tx.objectStore(STORE_SCORES).clear();tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export async function saveSetting(key,value){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_SETTINGS,'readwrite');tx.objectStore(STORE_SETTINGS).put({key,value});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export async function getSetting(key){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_SETTINGS,'readonly');const req=tx.objectStore(STORE_SETTINGS).get(key);req.onsuccess=()=>resolve(req.result?req.result.value:null);req.onerror=()=>reject(req.error);});}
+export async function getCoins(){return(await getSetting('spinecoins'))||0;}
+export async function addCoins(amount){const c=await getCoins();await saveSetting('spinecoins',c+amount);return c+amount;}
+export async function spendCoins(amount){const c=await getCoins();if(c<amount)return false;await saveSetting('spinecoins',c-amount);return true;}
+export async function getUnlockedPlanes(){return(await getSetting('unlockedPlanes'))||['biplane'];}
+export async function unlockPlane(planeId){const u=await getUnlockedPlanes();if(!u.includes(planeId)){u.push(planeId);await saveSetting('unlockedPlanes',u);}}
+export async function getQuestProgressLocal(){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_QUEST_PROGRESS,'readonly');const req=tx.objectStore(STORE_QUEST_PROGRESS).getAll();req.onsuccess=()=>{const result={};req.result.forEach(q=>{result[q.questId]={progress:q.progress,completed:q.completed};});resolve(result);};req.onerror=()=>reject(req.error);});}
+export async function saveQuestProgressLocal(questId,progress,completed){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_QUEST_PROGRESS,'readwrite');tx.objectStore(STORE_QUEST_PROGRESS).put({questId,progress,completed});tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);});}
+export async function getBannedPilots(){return(await getSetting('bannedPilots'))||{};}
+export async function banPilot(name){const banned=await getBannedPilots();banned[name.toLowerCase()]=Date.now()+2*60*1000;await saveSetting('bannedPilots',banned);await saveSetting('wasBannedOnce',true);}
+export async function isPilotBanned(name){const banned=await getBannedPilots();const key=name.toLowerCase();if(!banned[key])return false;if(Date.now()>banned[key]){delete banned[key];await saveSetting('bannedPilots',banned);return false;}return true;}
+export async function getBanRemainingMs(name){const banned=await getBannedPilots();const key=name.toLowerCase();if(!banned[key])return 0;return Math.max(0,banned[key]-Date.now());}
+export async function wasBannedOnce(){return!!(await getSetting('wasBannedOnce'));}`,
+
+  'js/renderer.js': `import{assets}from'./assets.js';
+let shakeX=0,shakeY=0,shakeMag=0;
+export function triggerScreenShake(magnitude){shakeMag=magnitude;}
+function updateShake(){if(shakeMag>0){shakeX=(Math.random()-0.5)*shakeMag*2;shakeY=(Math.random()-0.5)*shakeMag*2;shakeMag*=0.85;if(shakeMag<0.3){shakeMag=0;shakeX=0;shakeY=0;}}}
+export function drawBackground(ctx,w,h,weather,scrollOffset){let bgImg=weather==='clear'?assets.bg_plage:assets.bg_village;ctx.save();ctx.translate(shakeX,shakeY);if(!bgImg){ctx.fillStyle=weather==='storm'?'#0d1020':'#6ab0d8';ctx.fillRect(-shakeX,-shakeY,w,h);ctx.restore();return;}const bgW=(bgImg.width/bgImg.height)*h;const offset=scrollOffset%bgW;ctx.drawImage(bgImg,-offset,0,bgW,h);ctx.drawImage(bgImg,-offset+bgW,0,bgW,h);if(offset>0)ctx.drawImage(bgImg,-offset+bgW*2,0,bgW,h);if(weather==='storm'){ctx.fillStyle='rgba(5,8,25,0.55)';ctx.fillRect(0,0,w,h);}else if(weather==='cloudy'){ctx.fillStyle='rgba(20,25,50,0.25)';ctx.fillRect(0,0,w,h);}updateShake();ctx.restore();}
+export function drawGroundLine(ctx,w,groundY){ctx.save();ctx.translate(shakeX,shakeY);ctx.strokeStyle='rgba(239,68,68,0.25)';ctx.lineWidth=2;ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(0,groundY);ctx.lineTo(w,groundY);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+export function drawObstacles(ctx,obstacles){ctx.save();ctx.translate(shakeX,shakeY);for(const obs of obstacles){const img=assets[obs.asset];if(img)ctx.drawImage(img,obs.x,obs.y,obs.width,obs.height);}ctx.restore();}
+export function drawBullets(ctx,bullets){ctx.save();ctx.translate(shakeX,shakeY);for(const b of bullets){ctx.fillStyle=b.friendly?'#fde047':'#f87171';ctx.shadowColor=b.friendly?'#fde047':'#f87171';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(b.x,b.y,4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}ctx.restore();}
+export function drawGhost(ctx,ghostX,ghostY,ghostW,ghostH,ghostName){const img=assets.biplane;if(!img)return;ctx.save();ctx.globalAlpha=0.25;ctx.translate(shakeX,shakeY);ctx.drawImage(img,ghostX,ghostY,ghostW,ghostH);ctx.globalAlpha=0.35;ctx.fillStyle='#38bdf8';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText(ghostName||'Fantome',ghostX+ghostW/2,ghostY-6);ctx.restore();}
+export function drawLightnings(ctx,lightnings){ctx.save();ctx.translate(shakeX,shakeY);for(const l of lightnings){ctx.globalAlpha=l.alpha;ctx.strokeStyle='#ffe566';ctx.lineWidth=3;ctx.shadowColor='#fff8c0';ctx.shadowBlur=18;ctx.beginPath();for(const seg of l.segments){ctx.moveTo(seg.x1,seg.y1);ctx.lineTo(seg.x2,seg.y2);}ctx.stroke();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.5;ctx.shadowBlur=8;ctx.beginPath();for(const seg of l.segments){ctx.moveTo(seg.x1,seg.y1);ctx.lineTo(seg.x2,seg.y2);}ctx.stroke();}ctx.globalAlpha=1;ctx.shadowBlur=0;ctx.restore();}
+export function drawFlash(ctx,w,h,alpha){if(alpha>0){ctx.save();ctx.fillStyle=\`rgba(255,255,255,\${alpha})\`;ctx.fillRect(0,0,w,h);ctx.restore();}}
+export function drawPlane(ctx,planeImg,x,y,width,height,velocity){if(!planeImg)return;ctx.save();ctx.translate(shakeX,shakeY);const tilt=Math.max(-25,Math.min(25,velocity*2.8));const cx=x+width/2,cy=y+height/2;ctx.translate(cx,cy);ctx.rotate((tilt*Math.PI)/180);ctx.drawImage(planeImg,-width/2,-height/2,width,height);ctx.restore();}
+export function drawExplosion(ctx,x,y,progress){const img=assets.explosion;if(!img)return;const size=80+progress*60;ctx.save();ctx.globalAlpha=Math.max(0,1-progress);ctx.drawImage(img,x-size/2,y-size/2,size,size);ctx.restore();}
+export function drawMissile(ctx,missile){ctx.save();ctx.translate(shakeX,shakeY);ctx.fillStyle='#ef4444';ctx.shadowColor='#ef4444';ctx.shadowBlur=10;ctx.save();ctx.translate(missile.x,missile.y);const angle=Math.atan2(missile.dy,missile.dx);ctx.rotate(angle);ctx.beginPath();ctx.moveTo(20,0);ctx.lineTo(-10,6);ctx.lineTo(-10,-6);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,100,50,0.5)';for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(-10-i*6,(Math.random()-0.5)*4,4-i*0.5,0,Math.PI*2);ctx.fill();}ctx.restore();ctx.shadowBlur=0;ctx.restore();}
+export function drawHackerText(ctx,w,h,alpha,text){if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle='#00ff41';ctx.font='bold 18px monospace';ctx.textAlign='center';ctx.shadowColor='#00ff41';ctx.shadowBlur=20;const lines=text.split('\\n');const lineH=28;const totalH=lines.length*lineH;const startY=(h-totalH)/2;lines.forEach((line,i)=>ctx.fillText(line,w/2,startY+i*lineH+lineH));ctx.restore();}`,
+
+  'js/game.js': `import{assets}from'./assets.js';
+import{isPressing,setFirstPressCallback,resetControls}from'./controls.js';
+import{getWeatherPhase,getWeatherLabel,updateWind,getWindStrength,getWindLabel,resetWind}from'./weather.js';
+import{spawnObstacle,spawnLightning}from'./obstacles.js';
+import{rectsCollide,checkGroundCollision,checkLightningHit}from'./collision.js';
+import{drawBackground,drawGroundLine,drawObstacles,drawLightnings,drawFlash,drawPlane,drawExplosion,drawMissile,drawGhost,drawBullets,drawHackerText,triggerScreenShake}from'./renderer.js';
+import{saveScore,getRank,addCoins,getQuestProgressLocal,saveQuestProgressLocal}from'./db.js';
+import{saveGlobalScore,saveGlobalBestPath,getGlobalBestPath}from'./firebase.js';
+import{QUESTS}from'./quests.js';
+import{getPlane}from'./planes.js';
+import{playThrust,playExplosion as playSoundExplosion,playLightningStrike,playBirdHit,playMissile as playSoundMissile}from'./sound.js';
+const CONFIG={GRAVITY:0.32,THRUST:-0.85,MAX_FALL_SPEED:7,PLANE_WIDTH:110,PLANE_HEIGHT:70,PLANE_X:90,SCROLL_SPEED_BASE:3,SCROLL_SPEED_INCREMENT:0.12,MAX_SCROLL_SPEED:9,GROUND_LEVEL_PERCENT:0.78,OBSTACLE_INTERVAL_CLEAR:90,OBSTACLE_INTERVAL_CLOUDY:65,OBSTACLE_INTERVAL_STORM:50,LIGHTNING_INTERVAL:80,SCORE_PER_FRAME:0.5,HACKER_CEILING_FRAMES:1200,BULLET_SPEED:10,BULLET_COOLDOWN:30,ENEMY_SHOOT_INTERVAL:180};
+let canvas=null,ctx=null,gameRunning=false,gameStarted=false,gamePaused=false,animFrameId=null,selectedPlaneId='biplane',pilotName='Pilote',onGameOverCallback=null,glitchUsed=false;
+const pathRecord=[];let ghostData=null;
+const state={planeY:0,planeVelocity:0,scrollOffset:0,scrollSpeed:CONFIG.SCROLL_SPEED_BASE,score:0,elapsedTime:0,weather:'clear',obstacles:[],lightnings:[],bullets:[],obstacleTimer:0,lightningTimer:0,bulletCooldown:0,enemyShootTimer:0,bgFlashAlpha:0,explosionActive:false,explosionX:0,explosionY:0,explosionProgress:0,groundY:0,ceilingFrames:0,hackerMissile:null,hackerTextAlpha:0,hackerTextContent:'',stormSurviveSeconds:0,obstaclesPassedCount:0,completedQuestThisRun:null,coinsEarned:0};
+export function initGame(canvasEl){canvas=canvasEl;ctx=canvas.getContext('2d');resizeCanvas();window.addEventListener('resize',resizeCanvas);}
+export function setSelectedPlane(id){selectedPlaneId=id;}
+export function setPilotName(name){pilotName=name;}
+export function setGameOverCallback(cb){onGameOverCallback=cb;}
+export function isGamePaused(){return gamePaused;}
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;state.groundY=Math.floor(canvas.height*CONFIG.GROUND_LEVEL_PERCENT);}
+export async function startGame(){glitchUsed=false;pathRecord.length=0;state.planeY=canvas.height*0.38;state.planeVelocity=0;state.scrollOffset=0;state.scrollSpeed=CONFIG.SCROLL_SPEED_BASE;state.score=0;state.elapsedTime=0;state.weather='clear';state.obstacles=[];state.lightnings=[];state.bullets=[];state.obstacleTimer=0;state.lightningTimer=0;state.bulletCooldown=0;state.enemyShootTimer=0;state.bgFlashAlpha=0;state.explosionActive=false;state.explosionProgress=0;state.groundY=Math.floor(canvas.height*CONFIG.GROUND_LEVEL_PERCENT);state.ceilingFrames=0;state.hackerMissile=null;state.hackerTextAlpha=0;state.stormSurviveSeconds=0;state.obstaclesPassedCount=0;state.completedQuestThisRun=null;state.coinsEarned=0;resetControls();resetWind();ghostData=await getGlobalBestPath().catch(()=>null);document.getElementById('hud-score').textContent='0 m';document.getElementById('hud-weather').textContent='Clair';document.getElementById('hud-wind').textContent='';document.getElementById('hud-coins').textContent='+0 SC';document.getElementById('pause-hint').classList.remove('hidden');gameRunning=true;gameStarted=false;gamePaused=false;setFirstPressCallback(()=>{gameStarted=true;document.getElementById('pause-hint').classList.add('hidden');});if(animFrameId)cancelAnimationFrame(animFrameId);gameLoop();}
+export function pauseGame(){gamePaused=true;}
+export function resumeGame(){gamePaused=false;if(!animFrameId)gameLoop();}
+export function stopGame(){gameRunning=false;if(animFrameId){cancelAnimationFrame(animFrameId);animFrameId=null;}}
+function gameLoop(){if(!gameRunning||gamePaused){animFrameId=null;return;}animFrameId=requestAnimationFrame(gameLoop);if(!gameStarted){render();return;}state.elapsedTime++;state.weather=getWeatherPhase(state.elapsedTime);document.getElementById('hud-weather').textContent=getWeatherLabel(state.weather);updateWind(state.elapsedTime);const windLabel=getWindLabel();document.getElementById('hud-wind').textContent=windLabel||'';if(state.scrollSpeed<CONFIG.MAX_SCROLL_SPEED)state.scrollSpeed+=CONFIG.SCROLL_SPEED_INCREMENT/60;const plane=getPlane(selectedPlaneId);const windStrength=getWindStrength();if(isPressing()){state.planeVelocity+=CONFIG.THRUST;playThrust();}state.planeVelocity+=CONFIG.GRAVITY+windStrength;state.planeVelocity=Math.max(-CONFIG.MAX_FALL_SPEED,Math.min(CONFIG.MAX_FALL_SPEED,state.planeVelocity));state.planeY+=state.planeVelocity;if(state.planeY<0){state.planeY=0;state.planeVelocity=Math.max(0,state.planeVelocity);state.ceilingFrames++;triggerScreenShake(state.ceilingFrames>300?4:2);}else{state.ceilingFrames=0;}if(state.ceilingFrames>=CONFIG.HACKER_CEILING_FRAMES&&!state.hackerMissile)launchHackerMissile();if(state.hackerMissile)updateHackerMissile();if(state.hackerTextAlpha>0)state.hackerTextAlpha-=0.008;if(checkGroundCollision(state.planeY,CONFIG.PLANE_HEIGHT,state.groundY)){triggerGameOver('Collision avec le sol');return;}state.scrollOffset+=state.scrollSpeed;const scoreMultiplier=plane.scoreMultiplier||1.0;state.score+=CONFIG.SCORE_PER_FRAME;const coinsThisFrame=(CONFIG.SCORE_PER_FRAME*scoreMultiplier)/100;state.coinsEarned+=coinsThisFrame;document.getElementById('hud-score').textContent=Math.floor(state.score)+' m';document.getElementById('hud-coins').textContent='+'+Math.floor(state.coinsEarned)+' SC';if(state.weather==='storm')state.stormSurviveSeconds=state.elapsedTime/60-240;state.obstacleTimer++;let interval=CONFIG.OBSTACLE_INTERVAL_CLEAR;if(state.weather==='cloudy')interval=CONFIG.OBSTACLE_INTERVAL_CLOUDY;if(state.weather==='storm')interval=CONFIG.OBSTACLE_INTERVAL_STORM;if(state.obstacleTimer>=interval){const newObs=spawnObstacle(state.weather,canvas.width,canvas.height,state.groundY,state.scrollSpeed);state.obstacles.push(...newObs);state.obstacleTimer=0;}if(state.weather==='storm'){state.lightningTimer++;if(state.lightningTimer>=CONFIG.LIGHTNING_INTERVAL){state.lightnings.push(spawnLightning(canvas.width,canvas.height));state.bgFlashAlpha=0.35;state.lightningTimer=0;playLightningStrike();triggerScreenShake(6);}state.enemyShootTimer++;if(state.enemyShootTimer>=CONFIG.ENEMY_SHOOT_INTERVAL){spawnEnemyBullet();state.enemyShootTimer=0;}}state.bulletCooldown--;if(isPressing()&&state.bulletCooldown<=0){state.bullets.push({x:CONFIG.PLANE_X+CONFIG.PLANE_WIDTH,y:state.planeY+CONFIG.PLANE_HEIGHT/2,dx:CONFIG.BULLET_SPEED,dy:0,friendly:true});state.bulletCooldown=CONFIG.BULLET_COOLDOWN;}for(let i=state.bullets.length-1;i>=0;i--){const b=state.bullets[i];b.x+=b.dx;b.y+=b.dy;if(b.x>canvas.width+20||b.x<-20||b.y<-20||b.y>canvas.height+20){state.bullets.splice(i,1);continue;}if(!b.friendly){if(rectsCollide(CONFIG.PLANE_X,state.planeY,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT,b.x-5,b.y-5,10,10)){triggerGameOver('Touche par un tir ennemi');return;}}else{let hit=false;for(let j=state.obstacles.length-1;j>=0;j--){const obs=state.obstacles[j];if(obs.type==='plane'&&rectsCollide(b.x-4,b.y-4,8,8,obs.x,obs.y,obs.width,obs.height)){state.obstacles.splice(j,1);triggerScreenShake(4);playBirdHit();hit=true;break;}}if(hit)state.bullets.splice(i,1);}}for(let i=state.obstacles.length-1;i>=0;i--){const obs=state.obstacles[i];obs.x-=obs.speed;if(obs.diving)obs.y+=obs.divingSpeed;if(obs.x+obs.width<-50){state.obstacles.splice(i,1);state.obstaclesPassedCount++;continue;}if(rectsCollide(CONFIG.PLANE_X,state.planeY,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT,obs.x,obs.y,obs.width,obs.height)){if(selectedPlaneId==='the_glitch'&&!glitchUsed){glitchUsed=true;triggerScreenShake(8);continue;}triggerGameOver('Collision avec un obstacle');return;}}for(let i=state.lightnings.length-1;i>=0;i--){state.lightnings[i].alpha-=state.lightnings[i].decay;if(state.lightnings[i].alpha<=0)state.lightnings.splice(i,1);}if(state.lightnings.length>0&&checkLightningHit(state.lightnings,CONFIG.PLANE_X,state.planeY,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT)){triggerGameOver('Foudroye par un eclair');return;}if(state.bgFlashAlpha>0){state.bgFlashAlpha-=0.016;if(state.bgFlashAlpha<0)state.bgFlashAlpha=0;}if(state.elapsedTime%3===0)pathRecord.push({x:CONFIG.PLANE_X,y:state.planeY});render();}
+function spawnEnemyBullet(){const fromY=Math.random()*canvas.height*0.7;const dx=-(2+Math.random()*2);const targetY=state.planeY+CONFIG.PLANE_HEIGHT/2;const targetX=CONFIG.PLANE_X;const dist=Math.sqrt((targetX-canvas.width)**2+(targetY-fromY)**2);const dy=(targetY-fromY)/dist*Math.abs(dx)*0.8;state.bullets.push({x:canvas.width+10,y:fromY,dx,dy,friendly:false});}
+function launchHackerMissile(){playSoundMissile();triggerScreenShake(8);state.hackerMissile={x:canvas.width,y:Math.random()*canvas.height*0.5,dx:-(5+state.scrollSpeed),dy:0};}
+function updateHackerMissile(){const m=state.hackerMissile;const targetX=CONFIG.PLANE_X+CONFIG.PLANE_WIDTH/2;const targetY=state.planeY+CONFIG.PLANE_HEIGHT/2;const dx=targetX-m.x;const dy=targetY-m.y;const dist=Math.sqrt(dx*dx+dy*dy);if(dist>1){const speed=Math.abs(m.dx);m.dx=(dx/dist)*speed;m.dy=(dy/dist)*speed;}m.x+=m.dx;m.y+=m.dy;if(rectsCollide(CONFIG.PLANE_X,state.planeY,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT,m.x-15,m.y-10,30,20)){state.hackerMissile=null;triggerGameOver('HACKER');}else if(m.x<-50){state.hackerMissile=null;state.ceilingFrames=0;}}
+function render(){const w=canvas.width,h=canvas.height;drawBackground(ctx,w,h,state.weather,state.scrollOffset);drawGroundLine(ctx,w,state.groundY);if(ghostData&&ghostData.path.length>0){const gf=Math.min(Math.floor(state.elapsedTime/3),ghostData.path.length-1);const gp=ghostData.path[gf];if(gp)drawGhost(ctx,gp.x,gp.y,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT,ghostData.name);}drawObstacles(ctx,state.obstacles);drawLightnings(ctx,state.lightnings);drawBullets(ctx,state.bullets);drawFlash(ctx,w,h,state.bgFlashAlpha);const planeImg=assets[getPlane(selectedPlaneId).asset];drawPlane(ctx,planeImg,CONFIG.PLANE_X,state.planeY,CONFIG.PLANE_WIDTH,CONFIG.PLANE_HEIGHT,state.planeVelocity);if(state.hackerMissile)drawMissile(ctx,state.hackerMissile);if(state.explosionActive){drawExplosion(ctx,state.explosionX,state.explosionY,state.explosionProgress);state.explosionProgress=Math.min(1,state.explosionProgress+0.04);}if(state.hackerTextAlpha>0)drawHackerText(ctx,w,h,state.hackerTextAlpha,state.hackerTextContent);}
+async function triggerGameOver(cause){gameRunning=false;gameStarted=false;state.explosionActive=true;state.explosionX=CONFIG.PLANE_X+CONFIG.PLANE_WIDTH/2;state.explosionY=state.planeY+CONFIG.PLANE_HEIGHT/2;state.explosionProgress=0;playSoundExplosion();triggerScreenShake(14);render();if(cause==='HACKER'){state.hackerTextContent='HACKER DETECTE\\nVous avez ete banni pour 2 minutes';state.hackerTextAlpha=1;render();await new Promise(r=>setTimeout(r,2200));}else{await new Promise(r=>setTimeout(r,700));}state.explosionActive=false;const distance=Math.floor(state.score);const coinsRaw=Math.floor(state.coinsEarned);await saveScore(pilotName,distance);const rank=await getRank(distance);const totalCoins=await addCoins(coinsRaw);await checkAndUpdateQuests(distance);saveGlobalScore(pilotName,distance);const plane=getPlane(selectedPlaneId);if(distance>0&&plane.scoreMultiplier>=1.5)saveGlobalBestPath(pilotName,distance,pathRecord);if(onGameOverCallback)onGameOverCallback({distance,pilot:pilotName,rank,coinsEarned:coinsRaw,cause:cause==='HACKER'?'Banni (plafond)':cause,isHacker:cause==='HACKER',questCompleted:state.completedQuestThisRun});}
+async function checkAndUpdateQuests(distance){const progress=await getQuestProgressLocal();for(const quest of QUESTS){const existing=progress[quest.id]||{progress:0,completed:false};if(existing.completed)continue;let newProgress=existing.progress;let justCompleted=false;if(quest.type==='score_milestone'&&distance>=quest.target){newProgress=quest.target;justCompleted=true;}else if(quest.type==='score_no_ceiling'&&distance>=quest.target&&state.ceilingFrames===0){newProgress=quest.target;justCompleted=true;}else if(quest.type==='survive_time'&&state.elapsedTime/60>=quest.target){newProgress=quest.target;justCompleted=true;}else if(quest.type==='obstacles_passed'){newProgress=Math.min(quest.target,existing.progress+state.obstaclesPassedCount);if(newProgress>=quest.target)justCompleted=true;}else if(quest.type==='storm_survive'&&state.stormSurviveSeconds>=quest.target){newProgress=quest.target;justCompleted=true;}else if(quest.type==='total_coins'){const coins=await import('./db.js').then(m=>m.getCoins());if(coins>=quest.target){newProgress=quest.target;justCompleted=true;}}if(justCompleted){await saveQuestProgressLocal(quest.id,newProgress,true);await addCoins(quest.reward);if(!state.completedQuestThisRun)state.completedQuestThisRun=quest;}else if(newProgress>existing.progress){await saveQuestProgressLocal(quest.id,newProgress,false);}}}`,
+
+  'js/app.js': `import{loadAllAssets}from'./assets.js';
+import{setupControls}from'./controls.js';
+import{saveScore,getTopScores,getRank,clearAllScores,saveSetting,getSetting,getCoins,getUnlockedPlanes,unlockPlane,spendCoins,getQuestProgressLocal,isPilotBanned,banPilot,getBanRemainingMs,wasBannedOnce}from'./db.js';
+import{initGame,startGame,setSelectedPlane,setPilotName,setGameOverCallback,pauseGame,resumeGame,stopGame}from'./game.js';
+import{getGlobalTopScores}from'./firebase.js';
+import{PLANES,getPlane}from'./planes.js';
+import{QUESTS,areAllGlitchQuestsDone}from'./quests.js';
+import{setSoundEnabled,playQuestComplete,playUnlock,playBanned}from'./sound.js';
+let currentScreen='screen-loading',activeLeaderboardTab='global',pilotName='Pilote',selectedPlaneId='biplane',banTimerInterval=null;
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');currentScreen=id;}
+function escapeHTML(str){const div=document.createElement('div');div.textContent=str;return div.innerHTML;}
+async function updateCoinsDisplay(){const coins=await getCoins();['menu-coins-display','garage-coins-display'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=coins;});return coins;}
+async function renderLeaderboard(){const listEl=document.getElementById('leaderboard-list');listEl.innerHTML='<p class="leaderboard-empty">Chargement...</p>';let scores=[];if(activeLeaderboardTab==='global')scores=await getGlobalTopScores(20);else scores=await getTopScores(20);if(scores.length===0){listEl.innerHTML='<p class="leaderboard-empty">Aucun score enregistre</p>';return;}listEl.innerHTML=scores.map((s,i)=>{const rankClass=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';const isMine=s.name&&s.name.toLowerCase()===pilotName.toLowerCase()?'lb-mine':'';return\`<div class="lb-entry \${rankClass} \${isMine}"><div class="lb-rank">\${i+1}</div><div class="lb-name">\${escapeHTML(s.name||'---')}</div><div class="lb-score">\${s.distance} m</div></div>\`;}).join('');}
+async function renderGarage(){const grid=document.getElementById('garage-grid');const unlocked=await getUnlockedPlanes();const coins=await getCoins();const questProgress=await getQuestProgressLocal();const completedQuests=Object.entries(questProgress).filter(([,v])=>v.completed).map(([k])=>k);const allGlitchDone=areAllGlitchQuestsDone(completedQuests);grid.innerHTML=PLANES.map(plane=>{const isUnlocked=unlocked.includes(plane.id);const isActive=plane.id===selectedPlaneId;const canAfford=coins>=plane.price;let lockContent='';if(!isUnlocked){if(plane.unlockCondition?.type==='coins'){lockContent=\`<div class="garage-lock-overlay"><span class="garage-unlock-label">\${plane.price} SpineCoins</span><button class="btn btn-gold garage-select-btn \${canAfford?'':'disabled'}" data-buy="\${plane.id}" \${canAfford?'':'disabled'}>\${canAfford?'Acheter':'Insuffisant'}</button></div>\`;}else if(plane.unlockCondition?.type==='banned_once'){lockContent=\`<div class="garage-lock-overlay"><span class="garage-unlock-label">Etre banni une fois</span></div>\`;}else if(plane.unlockCondition?.type==='all_quests'){lockContent=\`<div class="garage-lock-overlay"><span class="garage-unlock-label">\${allGlitchDone?'Terminer les quetes':'Completer toutes les quetes de maitrise'}</span>\${allGlitchDone?\`<button class="btn btn-primary garage-select-btn" data-buy="\${plane.id}">Debloquer</button>\":''}</div>\`;}}return\`<div class="garage-card \${isActive&&isUnlocked?'active-plane':''} \${!isUnlocked?'locked':''}"><img src="\${plane.img}" alt="\${plane.name}"><div class="garage-card-name">\${plane.name}</div><div class="garage-card-status">\${isActive&&isUnlocked?'Actif':isUnlocked?plane.ability:'Verrouille'}</div>\${isUnlocked&&!isActive?\`<button class="btn btn-secondary garage-select-btn" data-select="\${plane.id}">Selectionner</button>\`:''}\${lockContent}</div>\`;}).join('');grid.querySelectorAll('[data-select]').forEach(btn=>{btn.addEventListener('click',async()=>{selectedPlaneId=btn.dataset.select;await saveSetting('selectedPlane',selectedPlaneId);setSelectedPlane(selectedPlaneId);updateActivePlaneDisplay();renderGarage();});});grid.querySelectorAll('[data-buy]').forEach(btn=>{btn.addEventListener('click',async()=>{const planeId=btn.dataset.buy;const plane=getPlane(planeId);if(plane.price>0){const success=await spendCoins(plane.price);if(!success)return;}await unlockPlane(planeId);playUnlock();selectedPlaneId=planeId;await saveSetting('selectedPlane',planeId);setSelectedPlane(planeId);updateActivePlaneDisplay();updateCoinsDisplay();renderGarage();});});}
+async function renderQuests(){const list=document.getElementById('quests-list');const progress=await getQuestProgressLocal();list.innerHTML=QUESTS.map(quest=>{const qp=progress[quest.id]||{progress:0,completed:false};const pct=Math.min(100,Math.round((qp.progress/quest.target)*100));const completedClass=qp.completed?'completed':'';return\`<div class="quest-card \${completedClass}"><div class="quest-top"><div><div class="quest-title">\${quest.title}</div><div class="quest-progress-label">\${quest.desc}</div></div><div class="quest-reward"><div class="coin-icon-small"></div>+\${quest.reward}</div></div><div class="quest-progress-bar"><div class="quest-progress-fill" style="width:\${pct}%"></div></div><div class="quest-progress-label">\${qp.completed?'Terminee':\`\${qp.progress} / \${quest.target}\`}</div></div>\`;}).join('');}
+function updateActivePlaneDisplay(){const plane=getPlane(selectedPlaneId);const imgEl=document.getElementById('active-plane-img');const nameEl=document.getElementById('active-plane-name');if(imgEl)imgEl.src=plane.img;if(nameEl)nameEl.textContent=plane.name;}
+function animateMenuCanvas(){const mc=document.getElementById('menu-canvas');if(!mc)return;const mCtx=mc.getContext('2d');mc.width=mc.offsetWidth;mc.height=mc.offsetHeight;const stars=Array.from({length:60},()=>({x:Math.random()*mc.width,y:Math.random()*mc.height,r:Math.random()*1.5+0.3,speed:Math.random()*0.4+0.1,alpha:Math.random()}));function drawMenuBg(){if(currentScreen!=='screen-menu')return;mCtx.clearRect(0,0,mc.width,mc.height);mCtx.fillStyle='#07090f';mCtx.fillRect(0,0,mc.width,mc.height);for(const s of stars){s.x-=s.speed;if(s.x<0){s.x=mc.width;s.y=Math.random()*mc.height;}s.alpha=0.4+Math.sin(Date.now()/1000+s.x)*0.3;mCtx.globalAlpha=s.alpha;mCtx.fillStyle='#7dd3fc';mCtx.beginPath();mCtx.arc(s.x,s.y,s.r,0,Math.PI*2);mCtx.fill();}mCtx.globalAlpha=1;requestAnimationFrame(drawMenuBg);}drawMenuBg();}
+function showBannedScreen(name,remainingMs){playBanned();document.getElementById('banned-pilot-name').textContent=escapeHTML(name);const timerEl=document.getElementById('banned-timer');const banStart=Date.now();const updateTimer=()=>{const remaining=Math.max(0,remainingMs-(Date.now()-banStart));const m=Math.floor(remaining/60000);const s=Math.floor((remaining%60000)/1000);timerEl.textContent=\`\${m}:\${s.toString().padStart(2,'0')}\`;if(remaining<=0)clearInterval(banTimerInterval);};clearInterval(banTimerInterval);updateTimer();banTimerInterval=setInterval(updateTimer,500);showScreen('screen-banned');}
+async function init(){const canvas=document.getElementById('game-canvas');initGame(canvas);setupControls(canvas);setGameOverCallback(async(result)=>{if(result.isHacker){await banPilot(result.pilot);stopGame();showBannedScreen(result.pilot,2*60*1000);const bannedOnce=await wasBannedOnce();if(bannedOnce)await unlockPlane('shadow_x');return;}document.getElementById('gameover-distance').textContent=result.distance+' m';document.getElementById('gameover-pilot').textContent=result.pilot;document.getElementById('gameover-rank').textContent='#'+result.rank;document.getElementById('gameover-coins').textContent='+'+result.coinsEarned;document.getElementById('gameover-cause').textContent=result.cause||'Collision';const questBlock=document.getElementById('gameover-quest-block');if(result.questCompleted){questBlock.style.display='flex';document.getElementById('gameover-quest-name').textContent=result.questCompleted.title;playQuestComplete();}else{questBlock.style.display='none';}await updateCoinsDisplay();const glitchUnlocked=await checkGlitchUnlock();if(glitchUnlocked)await unlockPlane('the_glitch');showScreen('screen-gameover');});try{await loadAllAssets();}catch(err){console.error('Erreur chargement assets:',err);}const savedPilot=await getSetting('pilotName');if(savedPilot){pilotName=savedPilot;document.getElementById('pilot-name').value=savedPilot;}const savedPlane=await getSetting('selectedPlane');if(savedPlane){const unlocked=await getUnlockedPlanes();if(unlocked.includes(savedPlane)){selectedPlaneId=savedPlane;setSelectedPlane(savedPlane);}}const savedSound=await getSetting('soundEnabled');const soundOn=savedSound!==false;const soundToggle=document.getElementById('toggle-sound');if(soundToggle){soundToggle.checked=soundOn;setSoundEnabled(soundOn);soundToggle.addEventListener('change',async()=>{setSoundEnabled(soundToggle.checked);await saveSetting('soundEnabled',soundToggle.checked);});}updateActivePlaneDisplay();await updateCoinsDisplay();await new Promise(r=>setTimeout(r,600));showScreen('screen-menu');animateMenuCanvas();document.getElementById('btn-play').addEventListener('click',async()=>{const nameInput=document.getElementById('pilot-name').value.trim();pilotName=nameInput||'Pilote';setPilotName(pilotName);await saveSetting('pilotName',pilotName);const banned=await isPilotBanned(pilotName);if(banned){const remainingMs=await getBanRemainingMs(pilotName);showBannedScreen(pilotName,remainingMs);return;}showScreen('screen-game');startGame();});document.getElementById('btn-leaderboard').addEventListener('click',async()=>{activeLeaderboardTab='global';document.getElementById('tab-global').classList.add('active');document.getElementById('tab-local').classList.remove('active');await renderLeaderboard();showScreen('screen-leaderboard');});document.getElementById('btn-leaderboard-back').addEventListener('click',()=>showScreen('screen-menu'));document.getElementById('tab-global').addEventListener('click',async()=>{activeLeaderboardTab='global';document.getElementById('tab-global').classList.add('active');document.getElementById('tab-local').classList.remove('active');await renderLeaderboard();});document.getElementById('tab-local').addEventListener('click',async()=>{activeLeaderboardTab='local';document.getElementById('tab-local').classList.add('active');document.getElementById('tab-global').classList.remove('active');await renderLeaderboard();});document.getElementById('btn-settings').addEventListener('click',()=>{updateActivePlaneDisplay();showScreen('screen-settings');});document.getElementById('btn-settings-back').addEventListener('click',()=>showScreen('screen-menu'));document.getElementById('btn-garage').addEventListener('click',async()=>{await updateCoinsDisplay();await renderGarage();showScreen('screen-garage');});document.getElementById('btn-garage-back').addEventListener('click',()=>showScreen('screen-menu'));document.getElementById('btn-quests').addEventListener('click',async()=>{await renderQuests();showScreen('screen-quests');});document.getElementById('btn-quests-back').addEventListener('click',()=>showScreen('screen-menu'));document.getElementById('btn-clear-scores').addEventListener('click',async()=>{await clearAllScores();const btn=document.getElementById('btn-clear-scores');btn.textContent='Effaces !';btn.disabled=true;setTimeout(()=>{btn.textContent='Effacer les scores locaux';btn.disabled=false;},1500);});document.getElementById('btn-retry').addEventListener('click',async()=>{const banned=await isPilotBanned(pilotName);if(banned){const remainingMs=await getBanRemainingMs(pilotName);showBannedScreen(pilotName,remainingMs);return;}showScreen('screen-game');startGame();});document.getElementById('btn-back-menu').addEventListener('click',async()=>{await updateCoinsDisplay();showScreen('screen-menu');});document.getElementById('hud-pause-btn').addEventListener('click',()=>{pauseGame();showScreen('screen-pause');});document.getElementById('btn-resume').addEventListener('click',()=>{showScreen('screen-game');resumeGame();});document.getElementById('btn-pause-menu').addEventListener('click',()=>{stopGame();showScreen('screen-menu');});document.getElementById('btn-banned-play').addEventListener('click',async()=>{const newName=document.getElementById('banned-new-name').value.trim();if(!newName)return;clearInterval(banTimerInterval);pilotName=newName;setPilotName(newName);await saveSetting('pilotName',newName);document.getElementById('pilot-name').value=newName;showScreen('screen-game');startGame();});}
+async function checkGlitchUnlock(){const progress=await getQuestProgressLocal();const completedIds=Object.entries(progress).filter(([,v])=>v.completed).map(([k])=>k);return areAllGlitchQuestsDone(completedIds);}
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();`
+};
+
+const BINARY_FILES = [
+  'assets/biplane.png',
+  'assets/avion_bleu.png',
+  'assets/explosion_2d.png',
+  'assets/skypine.png',
+  'assets/backgrounds/background_plage.png',
+  'assets/backgrounds/village.png',
+  'assets/ennemis/avion_rouge.png',
+  'assets/ennemis/nuage_eclair.png',
+  'assets/ennemis/oiseau_1_gauche.png',
+  'assets/ennemis/oiseau_2_gauche.png',
+  'assets/svg/chevron-left.svg',
+  'assets/svg/download-cloud.svg',
+  'assets/svg/gear-solid-full.svg',
+  'assets/svg/house-regular-full.svg'
+];
+
+document.getElementById('file-list').innerHTML =
+  Object.keys(FILES).map(f => `<div>${f}</div>`).join('') +
+  BINARY_FILES.map(f => `<div>${f} <span>(image - a copier manuellement)</span></div>`).join('');
+
+function strToU8(str) {
+  return new TextEncoder().encode(str);
+}
+
+function u32LE(n) {
+  const b = new Uint8Array(4);
+  b[0] = n & 0xff; b[1] = (n >> 8) & 0xff;
+  b[2] = (n >> 16) & 0xff; b[3] = (n >> 24) & 0xff;
+  return b;
+}
+
+function u16LE(n) {
+  const b = new Uint8Array(2);
+  b[0] = n & 0xff; b[1] = (n >> 8) & 0xff;
+  return b;
+}
+
+function crc32(data) {
+  const table = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i] = c;
+    }
+    return t;
+  })();
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) crc = table[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function concat(...arrays) {
+  const total = arrays.reduce((s, a) => s + a.length, 0);
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const a of arrays) { out.set(a, offset); offset += a.length; }
+  return out;
+}
+
+function zipEntry(filename, content) {
+  const nameBytes = strToU8(filename);
+  const contentBytes = typeof content === 'string' ? strToU8(content) : content;
+  const crc = crc32(contentBytes);
+  const size = contentBytes.length;
+
+  const localHeader = concat(
+    new Uint8Array([0x50, 0x4B, 0x03, 0x04]),
+    u16LE(20), u16LE(0), u16LE(0),
+    u16LE(0), u16LE(0),
+    u32LE(crc), u32LE(size), u32LE(size),
+    u16LE(nameBytes.length), u16LE(0),
+    nameBytes
+  );
+
+  const centralDir = concat(
+    new Uint8Array([0x50, 0x4B, 0x01, 0x02]),
+    u16LE(20), u16LE(20), u16LE(0), u16LE(0),
+    u16LE(0), u16LE(0), u16LE(0),
+    u32LE(crc), u32LE(size), u32LE(size),
+    u16LE(nameBytes.length), u16LE(0), u16LE(0), u16LE(0), u16LE(0),
+    u32LE(0), u32LE(0),
+    nameBytes
+  );
+
+  return { localHeader, data: contentBytes, centralDir, localSize: localHeader.length + contentBytes.length };
+}
+
+async function generateZip() {
+  const btn = document.getElementById('btn-download');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  status.textContent = 'Generation du ZIP en cours...';
+
+  await new Promise(r => setTimeout(r, 50));
+
+  const entries = [];
+  let offset = 0;
+
+  for (const [filename, content] of Object.entries(FILES)) {
+    const entry = zipEntry(filename, content);
+    entry.offset = offset;
+    entries.push(entry);
+    offset += entry.localHeader.length + entry.data.length;
+  }
+
+  const centralDirOffset = offset;
+  const centralDirs = entries.map(e => {
+    const nameBytes = strToU8(Object.keys(FILES)[entries.indexOf(e)]);
+    const cd = concat(
+      new Uint8Array([0x50, 0x4B, 0x01, 0x02]),
+      u16LE(20), u16LE(20), u16LE(0), u16LE(0),
+      u16LE(0), u16LE(0), u16LE(0),
+      u32LE(crc32(e.data)), u32LE(e.data.length), u32LE(e.data.length),
+      u16LE(nameBytes.length), u16LE(0), u16LE(0), u16LE(0), u16LE(0),
+      u32LE(0), u32LE(e.offset),
+      nameBytes
+    );
+    return cd;
+  });
+
+  const centralDirData = concat(...centralDirs);
+  const centralDirSize = centralDirData.length;
+
+  const eocd = concat(
+    new Uint8Array([0x50, 0x4B, 0x05, 0x06]),
+    u16LE(0), u16LE(0),
+    u16LE(entries.length), u16LE(entries.length),
+    u32LE(centralDirSize), u32LE(centralDirOffset),
+    u16LE(0)
+  );
+
+  const parts = [];
+  for (const e of entries) {
+    parts.push(e.localHeader);
+    parts.push(e.data);
+  }
+  parts.push(centralDirData);
+  parts.push(eocd);
+
+  const zipData = concat(...parts);
+  const blob = new Blob([zipData], { type: 'application/zip' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'SkySpine.zip';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  status.textContent = 'Telecharge ! Les fichiers images (PNG/SVG) sont a ajouter manuellement dans les dossiers assets/.';
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
