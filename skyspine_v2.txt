@@ -1,0 +1,50 @@
+Ajoute aussi d'autres avions qui seront debloque apres avoir accomplis des quetes, soit avec de l'argent aussi.
+commentaire a la 1 personne dans le code
+Ajoute un easter-egg des que la personne reste colle au plafond pendant 20secondes une missile fonce sur lui et explose son avion et un texte vert apparait a l'ecran et ecrit Hacker detecte vous avez ete banni pour 2 minutes et ne pourra pas jouer apres 2 minutes sauf si c'est une autre personne genre (samuel a ete banni il passe le telephone a Joseph et celui ci efface son nom et met le sien pour jouer.
+Et aussi met le Autoshoot plus facile a controler
+
+Aucun Emoji dans l'UI/UX
+redefinis completement le design rend le plus beau stp
+Garde "Idee par Samuel Alonso et code par Karlito" sauf que met le plus en Valeur pour qu'il soit visible par tous des le lancement du jeu.
+
+<script type="module"> // Import the functions you need from the SDKs you need import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js"; import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js"; // TODO: Add SDKs for Firebase products that you want to use // https://firebase.google.com/docs/web/setup#available-libraries // Your web app's Firebase configuration // For Firebase JS SDK v7.20.0 and later, measurementId is optional const firebaseConfig = { apiKey: "AIzaSyAr0C5DTL1zzdilQXScj9mmynX995MPeCs", authDomain: "skyspine-146ae.firebaseapp.com", projectId: "skyspine-146ae", storageBucket: "skyspine-146ae.firebasestorage.app", messagingSenderId: "888566895773", appId: "1:888566895773:web:d72a5d955cf2f55c8a3074", measurementId: "G-XTQWRHBEK3" }; // Initialize Firebase const app = initializeApp(firebaseConfig); const analytics = getAnalytics(app); </script>
+API Firebase pour les classements globales
+
+Ajoute des sons, on peut voir les scores des autres fait le site purement HTML, CSS et JAVASCRIPT, il doit etre un PWA ajoute un mode ou l'on tire contre d'autres avions.
+
+donne moi le fichier rules firebase pour permettre l'ecriture des scores dans FireBase
+Récompense : Des "SpineCoins" pour acheter les nouveaux avions dans ton garage.
+Screen Shake : Un léger tremblement de l'écran (via CSS transform: translate) quand le joueur frôle le plafond ou se fait toucher par le missile "Hacker"
+ Mode "Ghost" Multijoueur AsynchronePlutôt que du vrai multijoueur en temps réel (très complexe à gérer avec la latence), je te conseille d'afficher le "Ghost" du meilleur joueur mondial.Fonctionnement : Tu enregistres les positions ($x, y$) du meilleur score dans Firestore.Rendu : Je dessinerais un avion semi-transparent qui refait exactement le même parcours. C'est ultra motivant pour les joueurs de voir qu'ils dépassent le record en direct.
+
+Exemple de structure pour les quêtes (JSON dans Firestore) :
+{
+  "quests": {
+    "q1": { "desc": "Rester collé au plafond 5s", "reward": 100, "type": "time_ceiling" },
+    "q2": { "desc": "Atteindre 500 points", "reward": 250, "type": "score_milestone" }
+  }
+}
+
+Météo Dynamique et Impact sur la Physique
+Pour rendre le ciel plus vivant et augmenter la difficulté :
+
+Vent de face / Vent arrière : Parfois, une flèche apparaît à l'écran et l'avion devient plus lourd ou plus léger à diriger.
+
+Mode Nuit : Le fond devient totalement noir et seules les lumières de l'avion et des missiles ennemis éclairent les obstacles. C'est un défi de design intéressant pour tester les contrastes sans emojis.
+
+AvionCondition de déblocageCapacité SpécialeSpine-01Par défautÉquilibréShadow-XBanni 1 fois (Easter Egg)Invisible aux radars ennemisGold-Wing5000 SpineCoinsDouble les points gagnésThe GlitchFinir une quête "Hacker"Peut traverser 1 obstacle par partie.
+
+2. Les Quêtes pour débloquer "The Glitch"
+Comme c'est l'avion ultime, les quêtes doivent être progressives et variées. Voici une proposition de Quêtes de Maîtrise :
+
+Le Fantôme : Passer à travers 50 obstacles au total sans utiliser la capacité Glitch effet cummulable par partie.
+
+L'Incorruptible : Atteindre un score de 5000 Km/h sans jamais toucher le plafond (pour prouver que tu n'es pas un "Hacker").
+
+L'Investisseur : Accumuler 5 000 SpineCoins (le prix d'achat).
+
+Le Survivant : Faire une partie de plus de 5 minutes.
+stocker ces quêtes en ligne afin que le joueur ne perde pas sa progression s'il change de navigateur
+
+apres livre le tout en format tar.gz car je suis sur Linux Mint pour que je puisse le decompresser et l'uploader sur Netlify
+Faut finir toute les fonctionnalitees demande pour me livrer le fichier tar.gz
