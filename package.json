@@ -1,0 +1,13 @@
+{
+  "name": "skyspine",
+  "version": "2.0.0",
+  "description": "SkySpine - Jeu d'avion 2D",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
